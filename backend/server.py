@@ -9,6 +9,7 @@ import uvicorn
 import os
 import json
 import tempfile
+from dateutil.relativedelta import relativedelta  # Pour ajouter des mois
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
