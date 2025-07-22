@@ -197,6 +197,12 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
   const [vehicleCount, setVehicleCount] = useState(1);
   const [showReminderForm, setShowReminderForm] = useState(false);
 
+  useEffect(() => {
+    if (lead && lead.vehicles) {
+      setVehicleCount(lead.vehicles.length);
+    }
+  }, [lead]);
+
   // Auto-calculate contract end date when delivery date or contract duration changes
   useEffect(() => {
     if (formData.delivery_date && formData.vehicles.length > 0 && formData.vehicles[0].contract_duration) {
