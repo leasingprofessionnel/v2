@@ -474,24 +474,29 @@ class CRMAPITester:
 
     def run_all_tests(self):
         """Run all API tests in sequence"""
-        print("🚀 Starting CRM LLD Automobile API Tests")
+        print("🚀 Starting CRM LLD Automobile API Tests (Updated Features)")
         print(f"🔗 Testing API at: {self.base_url}")
         print("=" * 60)
 
-        # Test sequence
+        # Test sequence focusing on new features
         test_methods = [
             self.test_api_root,
             self.test_get_config,
-            self.test_create_lead,
+            self.test_specific_car_brands,
+            self.test_create_lead_single_vehicle,
+            self.test_create_lead_multi_vehicle,
             self.test_get_leads,
             self.test_get_single_lead,
             self.test_update_lead_status,
+            self.test_update_lead_note,
             self.test_search_leads,
+            self.test_search_in_notes,
+            self.test_filter_leads_by_commercial,
             self.test_filter_leads_by_status,
             self.test_dashboard_stats,
             self.test_create_activity,
             self.test_get_lead_activities,
-            self.test_delete_lead
+            self.cleanup_test_data
         ]
 
         for test_method in test_methods:
@@ -504,6 +509,11 @@ class CRMAPITester:
         
         if self.tests_passed == self.tests_run:
             print("🎉 ALL TESTS PASSED! Backend API is working correctly.")
+            print("✅ New features verified:")
+            print("   - New commercials (Matthews, Sauveur, Autre)")
+            print("   - Extended car brands database (56+ brands)")
+            print("   - Note field support")
+            print("   - Multi-vehicle support")
             return 0
         else:
             print(f"⚠️  {self.tests_run - self.tests_passed} tests failed. Check the issues above.")
