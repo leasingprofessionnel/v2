@@ -782,6 +782,7 @@ const LeadsView = ({ leads, config, onRefresh }) => {
   const [editingLead, setEditingLead] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [sortBy, setSortBy] = useState(''); // Nouveau état pour le tri
 
   const handleSave = async (leadData) => {
     try {
