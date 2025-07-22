@@ -949,7 +949,7 @@ const LeadsView = ({ leads, config, onRefresh }) => {
       </div>
 
       <LeadsTable 
-        leads={filteredLeads}
+        leads={sortedLeads}
         onEdit={(lead) => { setEditingLead(lead); setShowForm(true); }}
         onDelete={handleDelete}
         onStatusChange={handleStatusChange}
