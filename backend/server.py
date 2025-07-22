@@ -559,10 +559,6 @@ async def get_stats():
 async def export_backup():
     """Export complet de toutes les données (leads + rappels)"""
     try:
-        # Forcer une sauvegarde fraîche
-        save_leads_to_file()
-        save_reminders_to_file()
-        
         export_data = {
             "export_date": datetime.now().isoformat(),
             "version": "1.0",
