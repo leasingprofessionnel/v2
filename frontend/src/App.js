@@ -1085,8 +1085,10 @@ const LeadsView = ({ leads, config, onRefresh }) => {
           <option value="commercial">👥 Commercial (A-Z)</option>
           <option value="prestataire">🤝 Prestataire (A-Z)</option>
           <option value="vehicle_brand">🚗 Marque véhicule (A-Z)</option>
-          <option value="created_at">📅 Date (Plus récent)</option>
-          <option value="created_at_asc">📅 Date (Plus ancien)</option>
+          <option value="lead_creation_date">📅 Date création (Plus récent)</option>
+          <option value="lead_creation_date_asc">📅 Date création (Plus ancien)</option>
+          <option value="created_at">🔧 Date système (Plus récent)</option>
+          <option value="created_at_asc">🔧 Date système (Plus ancien)</option>
           <option value="commission_total">💰 Commission (Plus élevée)</option>
         </select>
       </div>
