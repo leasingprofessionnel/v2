@@ -81,7 +81,7 @@ class Lead(BaseModel):
     company: Company
     contact: Contact
     vehicles: List[Vehicle] = []
-    status: str = "premier_contact"
+    status: str = "a_contacter"  # Nouveau statut par défaut
     note: Optional[str] = None
     delivery_date: Optional[str] = None
     assigned_to_commercial: Optional[str] = None
