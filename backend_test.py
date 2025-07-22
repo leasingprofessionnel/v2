@@ -160,15 +160,16 @@ class CRMAPITester:
             success = response.status_code == 200
             if success:
                 data = response.json()
-                lead_id = data.get('id')
+                lead_id = data.get('lead', {}).get('id')
                 if lead_id:
                     self.created_lead_ids.append(lead_id)
                 
                 # Verify new features
-                note_ok = data.get('note') == lead_data['note']
-                commercial_ok = data.get('assigned_to_commercial') == 'Matthews'
-                vehicle_ok = (data.get('vehicles', [{}])[0].get('brand') == 'BMW' and
-                            data.get('vehicles', [{}])[0].get('model') == 'Série 3')
+                lead_data_obj = data.get('lead', {})
+                note_ok = lead_data_obj.get('note') == lead_data['note']
+                commercial_ok = lead_data_obj.get('assigned_to_commercial') == 'Matthews'
+                vehicle_ok = (lead_data_obj.get('vehicles', [{}])[0].get('brand') == 'BMW' and
+                            lead_data_obj.get('vehicles', [{}])[0].get('model') == 'Série 3')
                 
                 details = f"Status: {response.status_code}, Lead ID: {lead_id}, Note: {note_ok}, Commercial: {commercial_ok}, Vehicle: {vehicle_ok}"
             else:
