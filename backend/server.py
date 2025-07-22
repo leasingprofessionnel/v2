@@ -525,6 +525,54 @@ async def create_reminder(reminder_data: ReminderCreate):
     
     return {"message": "Rappel créé avec succès", "reminder": reminder}
 
+@app.delete("/api/reminders/{reminder_id}")
+async def delete_reminder(reminder_id: str):
+    if reminder_id not in reminders_db:
+        raise HTTPException(status_code=404, detail="Rappel introuvable")
+    
+    reminder = reminders_db[reminder_id]
+    
+    # Supprimer de la base des rappels
+    del reminders_db[reminder_id]
+    
+    # Supprimer aussi du lead associé
+    if reminder.lead_id in leads_db:
+        lead = leads_db[reminder.lead_id]
+        # Filtrer pour garder tous les rappels sauf celui à supprimer
+        lead.reminders = [r for r in lead.reminders if r.id != reminder_id]
+    
+    # 💾 SAUVEGARDE AUTOMATIQUE
+    save_reminders_to_file()
+    save_leads_to_file()  # Car on a modifié le lead aussi
+    
+    return {"message": "Rappel supprimé avec succès"}
+
+@app.put("/api/reminders/{reminder_id}")
+async def update_reminder(reminder_id: str, update_data: dict):
+    if reminder_id not in reminders_db:
+        raise HTTPException(status_code=404, detail="Rappel introuvable")
+    
+    reminder = reminders_db[reminder_id]
+    
+    # Mettre à jour les champs
+    for key, value in update_data.items():
+        if hasattr(reminder, key):
+            setattr(reminder, key, value)
+    
+    # Mettre à jour aussi dans le lead associé
+    if reminder.lead_id in leads_db:
+        lead = leads_db[reminder.lead_id]
+        for i, lead_reminder in enumerate(lead.reminders):
+            if lead_reminder.id == reminder_id:
+                lead.reminders[i] = reminder
+                break
+    
+    # 💾 SAUVEGARDE AUTOMATIQUE
+    save_reminders_to_file()
+    save_leads_to_file()
+    
+    return {"message": "Rappel mis à jour avec succès", "reminder": reminder}
+
 @app.get("/api/dashboard/stats")
 async def get_stats():
     total_leads = len(leads_db)
