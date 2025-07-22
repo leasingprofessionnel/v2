@@ -1200,34 +1200,66 @@ const Calendar = ({ leads }) => {
           <div className="space-y-4">
             {upcomingReminders.length > 0 ? (
               upcomingReminders.map((reminder) => (
-                <div key={reminder.id} className={`flex items-center space-x-4 p-4 rounded-lg ${
-                  reminder.completed ? 'bg-green-50 border-green-200' : 'bg-orange-50 border-orange-200'
-                } border`}>
+                <div key={reminder.id} className={`flex items-center space-x-4 p-4 rounded-lg border ${
+                  reminder.completed ? 'bg-green-50 border-green-200' : 
+                  reminder.priority === 'urgent' ? 'bg-red-50 border-red-200' :
+                  reminder.priority === 'high' ? 'bg-orange-50 border-orange-200' :
+                  'bg-blue-50 border-blue-200'
+                }`}>
                   <div className={`w-3 h-3 rounded-full ${
-                    reminder.completed ? 'bg-green-500' : 'bg-orange-500'
+                    reminder.completed ? 'bg-green-500' : 
+                    reminder.priority === 'urgent' ? 'bg-red-500' :
+                    reminder.priority === 'high' ? 'bg-orange-500' :
+                    'bg-blue-500'
                   }`}></div>
                   <div className="flex-1">
-                    <p className={`font-medium ${
-                      reminder.completed ? 'text-green-900 line-through' : 'text-gray-900'
-                    }`}>
-                      {reminder.title}
-                    </p>
+                    <div className="flex items-center space-x-2">
+                      <p className={`font-medium ${
+                        reminder.completed ? 'text-green-900 line-through' : 'text-gray-900'
+                      }`}>
+                        {reminder.title}
+                      </p>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        reminder.priority === 'urgent' ? 'bg-red-100 text-red-800' :
+                        reminder.priority === 'high' ? 'bg-orange-100 text-orange-800' :
+                        reminder.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {reminder.priority === 'urgent' ? '🚨 Urgent' :
+                         reminder.priority === 'high' ? '⚡ Prioritaire' :
+                         reminder.priority === 'medium' ? '📋 Normal' : '📝 Faible'}
+                      </span>
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        reminder.reminder_type === 'call' ? 'bg-blue-100 text-blue-800' :
+                        reminder.reminder_type === 'email' ? 'bg-purple-100 text-purple-800' :
+                        reminder.reminder_type === 'meeting' ? 'bg-green-100 text-green-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {reminder.reminder_type === 'call' ? '📞 Appel' :
+                         reminder.reminder_type === 'email' ? '✉️ Email' :
+                         reminder.reminder_type === 'meeting' ? '🤝 RDV' :
+                         reminder.reminder_type === 'follow_up' ? '📋 Suivi' : '📝 Général'}
+                      </span>
+                    </div>
                     {reminder.description && (
                       <p className={`text-sm ${
                         reminder.completed ? 'text-green-600' : 'text-gray-600'
-                      }`}>
+                      } mt-1`}>
                         {reminder.description}
                       </p>
                     )}
                     <p className={`text-xs ${
                       reminder.completed ? 'text-green-500' : 'text-gray-500'
-                    }`}>
-                      {new Date(reminder.reminder_date).toLocaleString('fr-FR')}
+                    } mt-1`}>
+                      📅 {new Date(reminder.reminder_date).toLocaleString('fr-FR')}
+                      {reminder.completed && reminder.completed_at && (
+                        <span className="ml-2">• ✅ Terminé le {new Date(reminder.completed_at).toLocaleDateString('fr-FR')}</span>
+                      )}
                     </p>
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => handleToggleCompleted(reminder.id, reminder.completed)}
+                      onClick={() => handleToggleCompleted(reminder.id)}
                       className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
                         reminder.completed 
                           ? 'bg-orange-600 text-white hover:bg-orange-700' 
