@@ -129,7 +129,8 @@ class ActivityCreate(BaseModel):
 class LeadCreate(BaseModel):
     company: CompanyCreate
     contact: ContactCreate
-    vehicle: VehicleCreate
+    vehicles: List[VehicleCreate] = []  # Support multiple vehicles
+    note: Optional[str] = None  # Champ note
     assigned_to_prestataire: Optional[str] = None
     assigned_to_commercial: Optional[str] = None
 
@@ -139,7 +140,8 @@ class LeadUpdate(BaseModel):
     assigned_to_commercial: Optional[str] = None
     company: Optional[CompanyCreate] = None
     contact: Optional[ContactCreate] = None
-    vehicle: Optional[VehicleCreate] = None
+    vehicles: Optional[List[VehicleCreate]] = None  # Support multiple vehicles
+    note: Optional[str] = None  # Champ note
 
 # Status colors mapping
 STATUS_COLORS = {
