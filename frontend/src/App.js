@@ -13,7 +13,7 @@ const Navbar = ({ activeTab, setActiveTab }) => (
         <div className="flex items-center">
           <div className="flex-shrink-0">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-white to-red-600 bg-clip-text text-transparent">
-              CRM LLD Auto 🚗
+              CRM LEASINPROFESSIONNEL.FR
             </h1>
           </div>
           <div className="hidden md:block">
