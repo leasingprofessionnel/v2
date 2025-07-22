@@ -451,5 +451,39 @@
     "assigned_to_prestataire": null,
     "reminders": [],
     "created_at": "2025-07-22T13:12:04.721633"
+  },
+  "61609839": {
+    "id": "61609839",
+    "company": {
+      "name": "Workflow Test Complete",
+      "siret": null,
+      "email": "workflow@test.fr",
+      "phone": null
+    },
+    "contact": {
+      "first_name": "Workflow",
+      "last_name": "Test",
+      "email": "workflow@test.fr",
+      "phone": null
+    },
+    "vehicles": [
+      {
+        "brand": "BMW",
+        "model": "X3",
+        "carburant": "diesel",
+        "contract_duration": 36,
+        "annual_mileage": 15000,
+        "tarif_mensuel": null,
+        "commission_agence": "1200€",
+        "payment_status": "paye"
+      }
+    ],
+    "status": "livree",
+    "note": "Test du workflow complet",
+    "delivery_date": null,
+    "assigned_to_commercial": null,
+    "assigned_to_prestataire": null,
+    "reminders": [],
+    "created_at": "2025-07-22T13:12:47.120907"
   }
 }
