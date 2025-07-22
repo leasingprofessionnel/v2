@@ -428,12 +428,13 @@ async def create_lead(lead_data: LeadCreate):
         created_at=datetime.now().isoformat()
     )
     
-    # 📅 CALCUL AUTOMATIQUE DE LA DATE DE FIN DE CONTRAT si statut livré
+    # 📅 CALCUL AUTOMATIQUE DE LA DATE DE FIN DE CONTRAT si données disponibles
     if hasattr(lead_data, 'delivery_date') and lead_data.delivery_date and lead_data.vehicles:
         lead.delivery_date = lead_data.delivery_date
         contract_duration = lead_data.vehicles[0].contract_duration
         if contract_duration:
             lead.contract_end_date = calculate_contract_end_date(lead_data.delivery_date, contract_duration)
+            print(f"📅 Création - Date fin contrat calculée: {lead.contract_end_date}")
     
     leads_db[lead_id] = lead
     
