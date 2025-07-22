@@ -1230,6 +1230,9 @@ const Backup = () => {
     </div>
   );
 };
+
+// Main App Component  
+function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [leads, setLeads] = useState([]);
   const [stats, setStats] = useState({});
@@ -1283,6 +1286,9 @@ const Backup = () => {
         )}
         {activeTab === 'calendar' && (
           <Calendar leads={leads} />
+        )}
+        {activeTab === 'backup' && (
+          <Backup />
         )}
       </main>
     </div>
