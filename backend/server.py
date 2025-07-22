@@ -428,10 +428,11 @@ async def create_lead(lead_data: LeadCreate):
         vehicles=lead_data.vehicles,
         note=lead_data.note,
         status=lead_data.status or "a_contacter",
+        lead_creation_date=lead_data.lead_creation_date or datetime.now().strftime('%Y-%m-%d'),
         delivery_date=lead_data.delivery_date,
         assigned_to_commercial=lead_data.assigned_to_commercial,
         assigned_to_prestataire=lead_data.assigned_to_prestataire,
-        created_at=datetime.now().isoformat()
+        created_at=datetime.now().isoformat()  # Timestamp système automatique
     )
     
     # 📅 CALCUL AUTOMATIQUE DE LA DATE DE FIN DE CONTRAT si données disponibles
