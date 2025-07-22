@@ -806,6 +806,7 @@ const LeadsTable = ({ leads, onEdit, onDelete, onStatusChange, statusColors, con
                   onChange={(e) => onStatusChange(lead.id, e.target.value)}
                   className="text-sm border-none bg-transparent focus:ring-2 focus:ring-blue-500 rounded"
                 >
+                  <option value="a_contacter">🔴 À contacter</option>
                   <option value="premier_contact">Premier contact</option>
                   <option value="relance">Relance</option>
                   <option value="attribue">Attribué</option>
@@ -813,7 +814,7 @@ const LeadsTable = ({ leads, onEdit, onDelete, onStatusChange, statusColors, con
                   <option value="attente_document">Attente document</option>
                   <option value="etude_en_cours">Étude en cours</option>
                   <option value="accord">Accord</option>
-                  <option value="livree">Livrée</option>
+                  <option value="livree">🟢 Livrée</option>
                   <option value="perdu">Perdu</option>
                 </select>
               </td>
