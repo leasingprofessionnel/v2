@@ -231,14 +231,15 @@ class CRMAPITester:
             success = response.status_code == 200
             if success:
                 data = response.json()
-                lead_id = data.get('id')
+                lead_id = data.get('lead', {}).get('id')
                 if lead_id:
                     self.created_lead_ids.append(lead_id)
                 
-                vehicles = data.get('vehicles', [])
+                lead_data_obj = data.get('lead', {})
+                vehicles = lead_data_obj.get('vehicles', [])
                 vehicle_count_ok = len(vehicles) == 3
                 brands_ok = [v.get('brand') for v in vehicles] == ['BMW', 'Mercedes', 'Audi']
-                commercial_ok = data.get('assigned_to_commercial') == 'Sauveur'
+                commercial_ok = lead_data_obj.get('assigned_to_commercial') == 'Sauveur'
                 
                 details = f"Status: {response.status_code}, Lead ID: {lead_id}, Vehicles: {len(vehicles)}/3, Brands: {brands_ok}, Commercial: {commercial_ok}"
             else:
