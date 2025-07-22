@@ -631,7 +631,29 @@ async def update_reminder(reminder_id: str, update_data: dict):
     save_reminders_to_file()
     save_leads_to_file()
     
-    return {"message": "Rappel mis à jour avec succès", "reminder": reminder}
+@app.put("/api/reminders/{reminder_id}/complete")
+async def complete_reminder(reminder_id: str):
+    if reminder_id not in reminders_db:
+        raise HTTPException(status_code=404, detail="Rappel introuvable")
+    
+    reminder = reminders_db[reminder_id]
+    reminder.completed = not reminder.completed  # Toggle
+    reminder.completed_at = datetime.now().isoformat() if reminder.completed else None
+    
+    # Mettre à jour aussi dans le lead associé
+    if reminder.lead_id in leads_db:
+        lead = leads_db[reminder.lead_id]
+        for i, lead_reminder in enumerate(lead.reminders):
+            if lead_reminder.id == reminder_id:
+                lead.reminders[i] = reminder
+                break
+    
+    # 💾 SAUVEGARDE AUTOMATIQUE
+    save_reminders_to_file()
+    save_leads_to_file()
+    
+    status = "complété" if reminder.completed else "rouvert"
+    return {"message": f"Rappel {status} avec succès", "reminder": reminder}
 
 @app.get("/api/dashboard/stats")
 async def get_stats():
