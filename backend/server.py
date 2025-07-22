@@ -96,6 +96,8 @@ class LeadCreate(BaseModel):
     contact: Contact
     vehicles: List[Vehicle] = []
     note: Optional[str] = None
+    status: Optional[str] = "a_contacter"
+    delivery_date: Optional[str] = None
     assigned_to_commercial: Optional[str] = None
     assigned_to_prestataire: Optional[str] = None
 
