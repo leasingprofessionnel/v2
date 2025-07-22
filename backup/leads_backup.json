@@ -110,5 +110,39 @@
     "assigned_to_prestataire": "Tesla",
     "reminders": [],
     "created_at": "2025-07-22T12:40:07.007033"
+  },
+  "e05ab3c2": {
+    "id": "e05ab3c2",
+    "company": {
+      "name": "Société Premier Contact",
+      "siret": null,
+      "email": "contact@premier.fr",
+      "phone": "0100000001"
+    },
+    "contact": {
+      "first_name": "Jean",
+      "last_name": "Prospect",
+      "email": "jean@premier.fr",
+      "phone": null
+    },
+    "vehicles": [
+      {
+        "brand": "Peugeot",
+        "model": "308",
+        "carburant": "diesel",
+        "contract_duration": 36,
+        "annual_mileage": 15000,
+        "tarif_mensuel": null,
+        "commission_agence": null,
+        "payment_status": "en_attente"
+      }
+    ],
+    "status": "premier_contact",
+    "note": "Lead en prospection - commissions non visibles",
+    "delivery_date": null,
+    "assigned_to_commercial": "Matthews",
+    "assigned_to_prestataire": null,
+    "reminders": [],
+    "created_at": "2025-07-22T12:52:23.589788"
   }
 }
