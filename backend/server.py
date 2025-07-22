@@ -290,6 +290,8 @@ async def get_config():
         "car_brands": CAR_BRANDS,
         "commerciaux": COMMERCIAUX,
         "prestataires": PRESTATAIRES,
+        "contract_durations": CONTRACT_DURATIONS,
+        "annual_mileages": ANNUAL_MILEAGES,
         "status_colors": {
             "premier_contact": "#94a3b8",
             "relance": "#f59e0b",
