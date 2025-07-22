@@ -217,7 +217,7 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
       for (let i = vehicles.length; i < newCount; i++) {
         vehicles.push({ 
           brand: '', model: '', carburant: 'diesel', contract_duration: 36, annual_mileage: 15000,
-          tarif_mensuel: '', commission_agence: ''
+          tarif_mensuel: '', commission_agence: '', payment_status: 'en_attente'
         });
       }
     } else {
