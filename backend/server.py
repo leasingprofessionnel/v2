@@ -85,6 +85,7 @@ class Vehicle(BaseModel):
     annual_mileage: int  # km/an
     tarif_mensuel: Optional[str] = None  # Nouveau champ
     commission_agence: Optional[str] = None  # Nouveau champ
+    payment_status: PaymentStatus = PaymentStatus.EN_ATTENTE  # Nouveau champ
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class Activity(BaseModel):
