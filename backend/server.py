@@ -506,7 +506,7 @@ def generate_lead_pdf(lead: Lead) -> str:
 # Routes
 @api_router.get("/")
 async def root():
-    return {"message": "CRM LLD Automobile API", "version": "1.0.0"}
+    return {"message": "CRM LEASINPROFESSIONNEL.FR API", "version": "1.0.0"}
 
 @api_router.get("/config")
 async def get_config():
