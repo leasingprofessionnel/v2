@@ -365,6 +365,44 @@ async def update_activity(activity_id: str, completed: bool):
         raise HTTPException(status_code=404, detail="Activity not found")
     return Activity(**updated_activity)
 
+# Reminders routes
+@api_router.post("/reminders", response_model=Reminder)
+async def create_reminder(reminder_data: ReminderCreate):
+    reminder = Reminder(**reminder_data.dict())
+    await db.reminders.insert_one(reminder.dict())
+    
+    # Also update the lead to include this reminder
+    await db.leads.update_one(
+        {"id": reminder_data.lead_id}, 
+        {"$push": {"reminders": reminder.dict()}, "$set": {"updated_at": datetime.utcnow()}}
+    )
+    return reminder
+
+@api_router.get("/reminders/{lead_id}", response_model=List[Reminder])
+async def get_lead_reminders(lead_id: str):
+    reminders = await db.reminders.find({"lead_id": lead_id}).to_list(1000)
+    return [Reminder(**reminder) for reminder in reminders]
+
+@api_router.put("/reminders/{reminder_id}", response_model=Reminder)
+async def update_reminder(reminder_id: str, completed: bool):
+    await db.reminders.update_one(
+        {"id": reminder_id}, 
+        {"$set": {"completed": completed, "updated_at": datetime.utcnow()}}
+    )
+    updated_reminder = await db.reminders.find_one({"id": reminder_id})
+    if not updated_reminder:
+        raise HTTPException(status_code=404, detail="Reminder not found")
+    return Reminder(**updated_reminder)
+
+@api_router.get("/calendar/reminders")
+async def get_upcoming_reminders(days: int = Query(7, ge=1, le=30)):
+    end_date = datetime.utcnow() + timedelta(days=days)
+    reminders = await db.reminders.find({
+        "reminder_date": {"$lte": end_date},
+        "completed": False
+    }).sort("reminder_date", 1).to_list(1000)
+    return [Reminder(**reminder) for reminder in reminders]
+
 # Dashboard stats
 @api_router.get("/dashboard/stats")
 async def get_dashboard_stats():
