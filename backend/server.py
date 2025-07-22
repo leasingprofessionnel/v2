@@ -558,6 +558,23 @@ async def update_lead(lead_id: str, lead_update: LeadUpdate):
         raise HTTPException(status_code=404, detail="Lead not found")
     
     update_data = lead_update.dict(exclude_unset=True)
+    
+    # Handle status change to "accord" - auto-set delivery date if not provided
+    if update_data.get("status") == "accord" and not update_data.get("delivery_date"):
+        update_data["delivery_date"] = date.today().isoformat()
+    
+    # Auto-calculate contract end date if delivery date and vehicles are provided
+    if update_data.get("delivery_date") and update_data.get("vehicles"):
+        delivery_date = date.fromisoformat(update_data["delivery_date"])
+        # Use the first vehicle's contract duration for end date calculation
+        first_vehicle_duration = update_data["vehicles"][0].get("contract_duration", 36)
+        update_data["contract_end_date"] = calculate_contract_end_date(delivery_date, first_vehicle_duration).isoformat()
+    elif update_data.get("delivery_date") and existing_lead.get("vehicles"):
+        # Use existing vehicles if vehicles not being updated
+        delivery_date = date.fromisoformat(update_data["delivery_date"])
+        first_vehicle_duration = existing_lead["vehicles"][0].get("contract_duration", 36)
+        update_data["contract_end_date"] = calculate_contract_end_date(delivery_date, first_vehicle_duration).isoformat()
+    
     if update_data:
         update_data["updated_at"] = datetime.utcnow()
         await db.leads.update_one({"id": lead_id}, {"$set": update_data})
