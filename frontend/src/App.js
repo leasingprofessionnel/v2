@@ -188,6 +188,7 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
     }],
     note: '',
     status: 'premier_contact', // Nouveau champ pour modifier le statut
+    lead_creation_date: new Date().toISOString().split('T')[0], // Date du jour par défaut
     assigned_to_prestataire: '',
     assigned_to_commercial: '',
     delivery_date: '', // Date de livraison
