@@ -70,6 +70,8 @@ class Vehicle(BaseModel):
     carburant: CarburantType
     contract_duration: int  # en mois
     annual_mileage: int  # km/an
+    tarif_mensuel: Optional[str] = None  # Nouveau champ
+    commission_agence: Optional[str] = None  # Nouveau champ
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class Activity(BaseModel):
@@ -79,6 +81,16 @@ class Activity(BaseModel):
     title: str
     description: Optional[str] = None
     due_date: Optional[datetime] = None
+    completed: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_by: Optional[str] = None
+
+class Reminder(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    lead_id: str
+    title: str
+    description: Optional[str] = None
+    reminder_date: datetime
     completed: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
     created_by: Optional[str] = None
@@ -93,6 +105,7 @@ class Lead(BaseModel):
     assigned_to_prestataire: Optional[str] = None
     assigned_to_commercial: Optional[str] = None
     activities: List[Activity] = []
+    reminders: List[Reminder] = []  # Nouveau champ pour les rappels
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
