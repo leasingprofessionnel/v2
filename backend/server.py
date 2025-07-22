@@ -87,7 +87,8 @@ class Lead(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     company: Company
     contact: Contact
-    vehicle: Vehicle
+    vehicles: List[Vehicle] = []  # Support multiple vehicles
+    note: Optional[str] = None  # Champ note multiligne
     status: LeadStatus = LeadStatus.PREMIER_CONTACT
     assigned_to_prestataire: Optional[str] = None
     assigned_to_commercial: Optional[str] = None
