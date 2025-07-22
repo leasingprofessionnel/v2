@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-Backend API Test Suite for CRM LLD Automobile
-Tests all the new features mentioned in the review request:
-1. New commercials (Matthews, Sauveur, Autre)
-2. Extended car brands database (56 brands)
-3. Note field support
-4. Multi-vehicle support
-5. All CRUD operations and filtering
+Backend API Test Suite for CRM LEASINPROFESSIONNEL.FR
+Tests all the restored features mentioned in the review request:
+1. PDF Export Functionality - GET /api/leads/{lead_id}/pdf
+2. Reminder System Backend - POST /api/reminders, GET /api/reminders, GET /api/calendar/reminders
+3. Car Brands and Models Configuration - GET /api/config (90+ car brands)
+4. Commercial and Prestataire Lists - GET /api/config
+5. Configuration API Endpoint - Complete configuration
 """
 
 import requests
 import sys
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any
 
 class CRMAPITester:
