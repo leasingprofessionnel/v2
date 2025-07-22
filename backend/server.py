@@ -118,6 +118,8 @@ class Lead(BaseModel):
     status: LeadStatus = LeadStatus.PREMIER_CONTACT
     assigned_to_prestataire: Optional[str] = None
     assigned_to_commercial: Optional[str] = None
+    delivery_date: Optional[date] = None  # Date de livraison (activée quand statut = "accord")
+    contract_end_date: Optional[date] = None  # Date de fin de contrat (calculée automatiquement)
     activities: List[Activity] = []
     reminders: List[Reminder] = []  # Nouveau champ pour les rappels
     created_at: datetime = Field(default_factory=datetime.utcnow)
