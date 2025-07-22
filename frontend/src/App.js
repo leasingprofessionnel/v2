@@ -95,22 +95,58 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
   const [formData, setFormData] = useState({
     company: { name: '', siret: '', address: '', phone: '', email: '' },
     contact: { first_name: '', last_name: '', email: '', phone: '', position: '' },
-    vehicle: { brand: '', model: '', carburant: 'diesel', contract_duration: 36, annual_mileage: 15000 },
+    vehicles: [{ brand: '', model: '', carburant: 'diesel', contract_duration: 36, annual_mileage: 15000 }],
+    note: '',
     assigned_to_prestataire: '',
     assigned_to_commercial: '',
     ...lead
   });
+
+  const [vehicleCount, setVehicleCount] = useState(1);
+
+  useEffect(() => {
+    if (lead && lead.vehicles) {
+      setVehicleCount(lead.vehicles.length);
+    }
+  }, [lead]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(formData);
   };
 
-  const selectedBrandModels = config.car_brands[formData.vehicle.brand] || [];
+  const handleVehicleCountChange = (newCount) => {
+    setVehicleCount(newCount);
+    const vehicles = [...formData.vehicles];
+    
+    if (newCount > vehicles.length) {
+      // Add new vehicles
+      for (let i = vehicles.length; i < newCount; i++) {
+        vehicles.push({ brand: '', model: '', carburant: 'diesel', contract_duration: 36, annual_mileage: 15000 });
+      }
+    } else {
+      // Remove excess vehicles
+      vehicles.splice(newCount);
+    }
+    
+    setFormData({ ...formData, vehicles });
+  };
+
+  const updateVehicle = (index, field, value) => {
+    const vehicles = [...formData.vehicles];
+    vehicles[index] = { ...vehicles[index], [field]: value };
+    
+    // Reset model when brand changes
+    if (field === 'brand') {
+      vehicles[index].model = '';
+    }
+    
+    setFormData({ ...formData, vehicles });
+  };
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-8 mx-auto p-8 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white">
+      <div className="relative top-8 mx-auto p-8 border w-11/12 max-w-6xl shadow-lg rounded-md bg-white max-h-screen overflow-y-auto">
         <h3 className="text-2xl font-bold mb-6 text-gray-900">
           {lead ? 'Modifier le lead' : 'Nouveau lead'}
         </h3>
@@ -214,81 +250,100 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
             </div>
           </div>
 
-          {/* Vehicle Section */}
+          {/* Vehicle Count Selection */}
+          <div className="bg-yellow-50 p-4 rounded-lg">
+            <h4 className="text-lg font-semibold mb-3 text-yellow-900">🔢 Nombre de véhicules</h4>
+            <select
+              value={vehicleCount}
+              onChange={(e) => handleVehicleCountChange(parseInt(e.target.value))}
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            >
+              {Array.from({length: 20}, (_, i) => i + 1).map(num => (
+                <option key={num} value={num}>{num} véhicule{num > 1 ? 's' : ''}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Vehicles Section */}
           <div className="bg-red-50 p-4 rounded-lg">
-            <h4 className="text-lg font-semibold mb-3 text-red-900">🚗 Véhicule</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <select
-                value={formData.vehicle.brand}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  vehicle: { ...formData.vehicle, brand: e.target.value, model: '' }
-                })}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                <option value="">Sélectionner une marque</option>
-                {Object.keys(config.car_brands || {}).map(brand => (
-                  <option key={brand} value={brand}>{brand}</option>
-                ))}
-              </select>
-              
-              <select
-                value={formData.vehicle.model}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  vehicle: { ...formData.vehicle, model: e.target.value }
-                })}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                required
-                disabled={!formData.vehicle.brand}
-              >
-                <option value="">Sélectionner un modèle</option>
-                {selectedBrandModels.map(model => (
-                  <option key={model} value={model}>{model}</option>
-                ))}
-              </select>
+            <h4 className="text-lg font-semibold mb-3 text-red-900">🚗 Véhicules</h4>
+            {formData.vehicles.map((vehicle, index) => {
+              const selectedBrandModels = config.car_brands?.[vehicle.brand] || [];
+              return (
+                <div key={index} className="border-2 border-red-200 p-4 rounded-lg mb-4 bg-white">
+                  <h5 className="font-medium text-red-800 mb-3">Véhicule {index + 1}</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <select
+                      value={vehicle.brand}
+                      onChange={(e) => updateVehicle(index, 'brand', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      required
+                    >
+                      <option value="">Sélectionner une marque</option>
+                      {Object.keys(config.car_brands || {}).map(brand => (
+                        <option key={brand} value={brand}>{brand}</option>
+                      ))}
+                    </select>
+                    
+                    <select
+                      value={vehicle.model}
+                      onChange={(e) => updateVehicle(index, 'model', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      required
+                      disabled={!vehicle.brand}
+                    >
+                      <option value="">Sélectionner un modèle</option>
+                      {selectedBrandModels.map(model => (
+                        <option key={model} value={model}>{model}</option>
+                      ))}
+                    </select>
 
-              <select
-                value={formData.vehicle.carburant}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  vehicle: { ...formData.vehicle, carburant: e.target.value }
-                })}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="diesel">Diesel</option>
-                <option value="essence">Essence</option>
-                <option value="hybride">Hybride</option>
-                <option value="electrique">Électrique</option>
-              </select>
+                    <select
+                      value={vehicle.carburant}
+                      onChange={(e) => updateVehicle(index, 'carburant', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="diesel">Diesel</option>
+                      <option value="essence">Essence</option>
+                      <option value="hybride">Hybride</option>
+                      <option value="electrique">Électrique</option>
+                    </select>
 
-              <select
-                value={formData.vehicle.contract_duration}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  vehicle: { ...formData.vehicle, contract_duration: parseInt(e.target.value) }
-                })}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-              >
-                {(config.contract_durations || []).map(duration => (
-                  <option key={duration} value={duration}>{duration} mois</option>
-                ))}
-              </select>
+                    <select
+                      value={vehicle.contract_duration}
+                      onChange={(e) => updateVehicle(index, 'contract_duration', parseInt(e.target.value))}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    >
+                      {(config.contract_durations || []).map(duration => (
+                        <option key={duration} value={duration}>{duration} mois</option>
+                      ))}
+                    </select>
 
-              <select
-                value={formData.vehicle.annual_mileage}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  vehicle: { ...formData.vehicle, annual_mileage: parseInt(e.target.value) }
-                })}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-              >
-                {(config.annual_mileages || []).map(mileage => (
-                  <option key={mileage} value={mileage}>{mileage.toLocaleString()} km/an</option>
-                ))}
-              </select>
-            </div>
+                    <select
+                      value={vehicle.annual_mileage}
+                      onChange={(e) => updateVehicle(index, 'annual_mileage', parseInt(e.target.value))}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    >
+                      {(config.annual_mileages || []).map(mileage => (
+                        <option key={mileage} value={mileage}>{mileage.toLocaleString()} km/an</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Note Section */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="text-lg font-semibold mb-3 text-gray-900">📝 Note</h4>
+            <textarea
+              placeholder="Commentaires ou informations complémentaires..."
+              value={formData.note}
+              onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+              rows="4"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 resize-vertical"
+            />
           </div>
 
           {/* Attribution Section */}
@@ -354,7 +409,7 @@ const LeadsTable = ({ leads, onEdit, onDelete, onStatusChange, statusColors, con
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Société</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Véhicule</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Véhicules</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attribution</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -379,10 +434,21 @@ const LeadsTable = ({ leads, onEdit, onDelete, onStatusChange, statusColors, con
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">
-                  {lead.vehicle.brand} {lead.vehicle.model}
-                </div>
-                <div className="text-sm text-gray-500">
-                  {lead.vehicle.carburant} - {lead.vehicle.contract_duration}mois
+                  {lead.vehicles && lead.vehicles.length > 0 ? (
+                    <>
+                      <div>{lead.vehicles[0].brand} {lead.vehicles[0].model}</div>
+                      <div className="text-sm text-gray-500">
+                        {lead.vehicles[0].carburant} - {lead.vehicles[0].contract_duration}mois
+                      </div>
+                      {lead.vehicles.length > 1 && (
+                        <div className="text-xs text-blue-600">
+                          +{lead.vehicles.length - 1} véhicule{lead.vehicles.length > 2 ? 's' : ''}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-sm text-gray-400">Aucun véhicule</div>
+                  )}
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
@@ -476,7 +542,12 @@ const LeadsView = ({ leads, config, onRefresh }) => {
     const matchesSearch = !searchTerm || 
       lead.company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       lead.contact.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.contact.last_name.toLowerCase().includes(searchTerm.toLowerCase());
+      lead.contact.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (lead.vehicles && lead.vehicles.some(v => 
+        v.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        v.model.toLowerCase().includes(searchTerm.toLowerCase())
+      )) ||
+      (lead.note && lead.note.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesStatus = !statusFilter || lead.status === statusFilter;
     
@@ -553,7 +624,9 @@ const Calendar = ({ leads }) => (
             <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
             <div>
               <p className="font-medium">Relancer {lead.contact.first_name} {lead.contact.last_name}</p>
-              <p className="text-sm text-gray-600">{lead.company.name} - {lead.vehicle.brand} {lead.vehicle.model}</p>
+              <p className="text-sm text-gray-600">
+                {lead.company.name} - {lead.vehicles && lead.vehicles[0] ? `${lead.vehicles[0].brand} ${lead.vehicles[0].model}` : 'Véhicule à définir'}
+              </p>
             </div>
           </div>
         ))}
