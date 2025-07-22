@@ -613,6 +613,17 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
               );
             })}
           </div>
+          ) : (
+            <div className="bg-gray-50 p-4 rounded-lg border-2 border-dashed border-gray-300">
+              <div className="text-center py-6">
+                <div className="text-4xl text-gray-400 mb-3">🚗</div>
+                <h4 className="text-lg font-medium text-gray-600 mb-2">Aucun véhicule spécifié</h4>
+                <p className="text-sm text-gray-500">
+                  Vous pourrez ajouter les détails du véhicule plus tard en modifiant ce lead
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Note Section */}
           <div className="bg-gray-50 p-4 rounded-lg">
