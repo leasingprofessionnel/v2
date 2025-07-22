@@ -533,7 +533,7 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
                       ))}
                     </select>
 
-                    {/* Nouveaux champs */}
+                    {/* Nouveaux champs sur la même ligne */}
                     <input
                       type="text"
                       placeholder="Tarif mensuel"
@@ -542,7 +542,7 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                  <div className="mt-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
                     <input
                       type="text"
                       placeholder="Commission agence"
@@ -550,6 +550,15 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
                       onChange={(e) => updateVehicle(index, 'commission_agence', e.target.value)}
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                     />
+                    
+                    <select
+                      value={vehicle.payment_status || 'en_attente'}
+                      onChange={(e) => updateVehicle(index, 'payment_status', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="en_attente">En attente</option>
+                      <option value="paye">Payé</option>
+                    </select>
                   </div>
                 </div>
               );
