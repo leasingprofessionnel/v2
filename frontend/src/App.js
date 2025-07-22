@@ -611,6 +611,38 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
             </div>
           </div>
 
+          {/* Dates importantes Section - Affichée seulement si statut "accord" ou dates déjà définies */}
+          {(formData.status === 'accord' || formData.delivery_date || formData.contract_end_date) && (
+            <div className="bg-amber-50 p-4 rounded-lg">
+              <h4 className="text-lg font-semibold mb-3 text-amber-900">📅 Dates importantes</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Date de livraison {formData.status === 'accord' && '*'}
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.delivery_date || ''}
+                    onChange={(e) => setFormData({ ...formData, delivery_date: e.target.value })}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    disabled={formData.status !== 'accord' && formData.status !== 'livree'}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Date de fin de contrat (calculée automatiquement)
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.contract_end_date || ''}
+                    className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                    disabled
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="flex justify-end space-x-4 pt-6">
             <button
               type="button"
