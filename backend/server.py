@@ -492,7 +492,7 @@ def generate_lead_pdf(lead: Lead) -> str:
     footer_text = f"""
     <para align="center">
     <font size="8">
-    Document généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')} par le CRM LLD Automobile<br/>
+    Document généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')} par CRM LEASINPROFESSIONNEL.FR<br/>
     © 2025 - Tous droits réservés
     </font>
     </para>
