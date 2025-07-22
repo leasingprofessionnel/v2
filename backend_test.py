@@ -674,20 +674,35 @@ class CRMAPITester:
         return self.log_test("Cleanup Test Data", cleaned == len(self.created_lead_ids), details)
 
     def run_all_tests(self):
-        """Run all API tests in sequence"""
-        print("🚀 Starting CRM LLD Automobile API Tests (Updated Features)")
+        """Run all API tests in sequence - focusing on restored CRM features"""
+        print("🚀 Starting CRM LEASINPROFESSIONNEL.FR API Tests (Restored Features)")
         print(f"🔗 Testing API at: {self.base_url}")
-        print("=" * 60)
+        print("=" * 70)
 
-        # Test sequence focusing on new features
+        # Test sequence focusing on restored features (priority order)
         test_methods = [
+            # Core API
             self.test_api_root,
+            
+            # Priority 1: Configuration with 90+ car brands, commerciaux, prestataires
             self.test_get_config,
-            self.test_specific_car_brands,
+            self.test_comprehensive_car_brands,
+            
+            # Priority 2: Lead creation for PDF and reminder testing
             self.test_create_lead_single_vehicle,
             self.test_create_lead_multi_vehicle,
             self.test_get_leads,
             self.test_get_single_lead,
+            
+            # Priority 3: PDF Export Functionality
+            self.test_pdf_export,
+            
+            # Priority 4: Reminder System Backend
+            self.test_create_reminder,
+            self.test_get_reminders,
+            self.test_calendar_reminders,
+            
+            # Additional functionality tests
             self.test_update_lead_status,
             self.test_update_lead_note,
             self.test_search_leads,
@@ -695,8 +710,13 @@ class CRMAPITester:
             self.test_filter_leads_by_commercial,
             self.test_filter_leads_by_status,
             self.test_dashboard_stats,
+            self.test_specific_car_brands,
+            
+            # Activity tests (if endpoints exist)
             self.test_create_activity,
             self.test_get_lead_activities,
+            
+            # Cleanup
             self.cleanup_test_data
         ]
 
@@ -705,19 +725,31 @@ class CRMAPITester:
             print()  # Add spacing between tests
 
         # Final results
-        print("=" * 60)
+        print("=" * 70)
         print(f"📊 TEST RESULTS: {self.tests_passed}/{self.tests_run} tests passed")
         
         if self.tests_passed == self.tests_run:
-            print("🎉 ALL TESTS PASSED! Backend API is working correctly.")
-            print("✅ New features verified:")
-            print("   - New commercials (Matthews, Sauveur, Autre)")
-            print("   - Extended car brands database (56+ brands)")
-            print("   - Note field support")
-            print("   - Multi-vehicle support")
+            print("🎉 ALL TESTS PASSED! CRM LEASINPROFESSIONNEL.FR Backend is working correctly.")
+            print("✅ Restored features verified:")
+            print("   - PDF Export Functionality (/api/leads/{id}/pdf)")
+            print("   - Reminder System (POST/GET /api/reminders, GET /api/calendar/reminders)")
+            print("   - 90+ Car Brands and Models Configuration")
+            print("   - Commercial and Prestataire Lists")
+            print("   - Complete Configuration API Endpoint")
             return 0
         else:
-            print(f"⚠️  {self.tests_run - self.tests_passed} tests failed. Check the issues above.")
+            failed_count = self.tests_run - self.tests_passed
+            print(f"⚠️  {failed_count} tests failed. Check the issues above.")
+            
+            # Identify critical failures
+            critical_failures = []
+            if self.tests_run > 0:
+                print("\n🔍 CRITICAL ISSUES TO ADDRESS:")
+                print("   - Check server logs for detailed error information")
+                print("   - Verify all endpoints are properly implemented")
+                print("   - Ensure PDF generation libraries are installed")
+                print("   - Confirm reminder system database operations")
+            
             return 1
 
 def main():
