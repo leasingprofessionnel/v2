@@ -272,6 +272,17 @@ def load_reminders_from_file():
 load_leads_from_file()
 load_reminders_from_file()
 
+# Fonction utilitaire pour calculer la date de fin de contrat
+def calculate_contract_end_date(delivery_date_str: str, contract_duration_months: int) -> str:
+    """Calcule la date de fin de contrat en ajoutant la durée à la date de livraison"""
+    try:
+        delivery_date = datetime.fromisoformat(delivery_date_str).date()
+        contract_end_date = delivery_date + relativedelta(months=contract_duration_months)
+        return contract_end_date.isoformat()
+    except Exception as e:
+        print(f"Erreur calcul date fin contrat: {e}")
+        return ""
+
 # Génération PDF
 def generate_lead_pdf(lead: Lead) -> str:
     import tempfile
