@@ -767,9 +767,12 @@ const LeadsTable = ({ leads, onEdit, onDelete, onStatusChange, statusColors, con
                 <div className="text-sm text-gray-900">
                   {lead.vehicles && lead.vehicles.length > 0 ? (
                     <>
-                      <div>{lead.vehicles[0].brand} {lead.vehicles[0].model}</div>
+                      <div>
+                        {lead.vehicles[0].brand || 'Marque'} {lead.vehicles[0].model || (lead.vehicles[0].brand ? '(modèle à définir)' : 'non définie')}
+                      </div>
                       <div className="text-sm text-gray-500">
-                        {lead.vehicles[0].carburant} - {lead.vehicles[0].contract_duration}mois
+                        {lead.vehicles[0].carburant ? `${lead.vehicles[0].carburant}` : 'Carburant à définir'}
+                        {lead.vehicles[0].contract_duration && ` - ${lead.vehicles[0].contract_duration}mois`}
                         {lead.vehicles[0].tarif_mensuel && (
                           <span className="ml-2 text-green-600">{lead.vehicles[0].tarif_mensuel}</span>
                         )}
@@ -790,7 +793,9 @@ const LeadsTable = ({ leads, onEdit, onDelete, onStatusChange, statusColors, con
                       )}
                     </>
                   ) : (
-                    <div className="text-sm text-gray-400">Aucun véhicule</div>
+                    <div className="text-sm text-gray-400 italic">
+                      <span className="inline-block w-4 h-4 text-center">🚗</span> À définir plus tard
+                    </div>
                   )}
                 </div>
               </td>
