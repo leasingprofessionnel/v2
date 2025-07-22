@@ -1735,6 +1735,9 @@ function App() {
         {activeTab === 'leads' && (
           <LeadsView leads={leads} config={config} onRefresh={fetchData} />
         )}
+        {activeTab === 'clients' && (
+          <Clients config={config} />
+        )}
         {activeTab === 'calendar' && (
           <Calendar leads={leads} />
         )}
