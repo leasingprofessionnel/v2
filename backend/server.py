@@ -188,6 +188,87 @@ PRESTATAIRES = ["Localease", "Leasefactory", "Ayvens", "ALD Automotive", "Arval"
 CONTRACT_DURATIONS = [12, 24, 36, 48, 60]
 ANNUAL_MILEAGES = [10000, 15000, 20000, 25000, 30000, 35000, 40000, 50000]
 
+# Fonctions de sauvegarde et restauration (après définition des modèles)
+def save_leads_to_file():
+    """Sauvegarde automatique des leads dans un fichier JSON"""
+    try:
+        leads_data = {}
+        for lead_id, lead in leads_db.items():
+            leads_data[lead_id] = lead.dict() if hasattr(lead, 'dict') else lead.__dict__
+        
+        with open(LEADS_BACKUP_FILE, 'w', encoding='utf-8') as f:
+            json.dump(leads_data, f, indent=2, ensure_ascii=False, default=str)
+        
+        print(f"✅ Sauvegarde automatique : {len(leads_data)} leads sauvegardés")
+    except Exception as e:
+        print(f"❌ Erreur sauvegarde leads : {str(e)}")
+
+def save_reminders_to_file():
+    """Sauvegarde automatique des rappels dans un fichier JSON"""
+    try:
+        reminders_data = {}
+        for reminder_id, reminder in reminders_db.items():
+            reminders_data[reminder_id] = reminder.dict() if hasattr(reminder, 'dict') else reminder.__dict__
+        
+        with open(REMINDERS_BACKUP_FILE, 'w', encoding='utf-8') as f:
+            json.dump(reminders_data, f, indent=2, ensure_ascii=False, default=str)
+        
+        print(f"✅ Sauvegarde automatique : {len(reminders_data)} rappels sauvegardés")
+    except Exception as e:
+        print(f"❌ Erreur sauvegarde rappels : {str(e)}")
+
+def load_leads_from_file():
+    """Restauration automatique des leads depuis le fichier JSON"""
+    global leads_db
+    try:
+        if os.path.exists(LEADS_BACKUP_FILE):
+            with open(LEADS_BACKUP_FILE, 'r', encoding='utf-8') as f:
+                leads_data = json.load(f)
+            
+            for lead_id, lead_dict in leads_data.items():
+                lead = Lead(
+                    id=lead_dict.get('id'),
+                    company=Company(**lead_dict['company']),
+                    contact=Contact(**lead_dict['contact']),
+                    vehicles=[Vehicle(**v) for v in lead_dict.get('vehicles', [])],
+                    status=lead_dict.get('status', 'premier_contact'),
+                    note=lead_dict.get('note'),
+                    delivery_date=lead_dict.get('delivery_date'),
+                    assigned_to_commercial=lead_dict.get('assigned_to_commercial'),
+                    assigned_to_prestataire=lead_dict.get('assigned_to_prestataire'),
+                    reminders=[Reminder(**r) for r in lead_dict.get('reminders', [])],
+                    created_at=lead_dict.get('created_at')
+                )
+                leads_db[lead_id] = lead
+            
+            print(f"🔄 Restauration automatique : {len(leads_data)} leads chargés depuis la sauvegarde")
+        else:
+            print("📂 Aucun fichier de sauvegarde leads trouvé")
+    except Exception as e:
+        print(f"❌ Erreur restauration leads : {str(e)}")
+
+def load_reminders_from_file():
+    """Restauration automatique des rappels depuis le fichier JSON"""
+    global reminders_db
+    try:
+        if os.path.exists(REMINDERS_BACKUP_FILE):
+            with open(REMINDERS_BACKUP_FILE, 'r', encoding='utf-8') as f:
+                reminders_data = json.load(f)
+            
+            for reminder_id, reminder_dict in reminders_data.items():
+                reminder = Reminder(**reminder_dict)
+                reminders_db[reminder_id] = reminder
+            
+            print(f"🔄 Restauration automatique : {len(reminders_data)} rappels chargés depuis la sauvegarde")
+        else:
+            print("📂 Aucun fichier de sauvegarde rappels trouvé")
+    except Exception as e:
+        print(f"❌ Erreur restauration rappels : {str(e)}")
+
+# Charger les données au démarrage
+load_leads_from_file()
+load_reminders_from_file()
+
 # Génération PDF
 def generate_lead_pdf(lead: Lead) -> str:
     import tempfile
