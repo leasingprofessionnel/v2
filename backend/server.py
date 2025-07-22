@@ -98,6 +98,7 @@ class LeadCreate(BaseModel):
     vehicles: List[Vehicle] = []
     note: Optional[str] = None
     status: Optional[str] = "a_contacter"
+    lead_creation_date: Optional[str] = None  # Date de création modifiable
     delivery_date: Optional[str] = None
     assigned_to_commercial: Optional[str] = None
     assigned_to_prestataire: Optional[str] = None
