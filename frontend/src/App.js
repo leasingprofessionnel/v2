@@ -1451,6 +1451,237 @@ const Backup = () => {
   );
 };
 
+// Clients Component
+const Clients = ({ config }) => {
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('');
+
+  const fetchClients = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API}/clients`);
+      setClients(response.data);
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchClients();
+  }, []);
+
+  // Filtrage et tri des clients
+  const filteredClients = clients.filter(client => {
+    const matchesSearch = !searchTerm || 
+      client.company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.contact.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.contact.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (client.vehicles && client.vehicles.some(v => 
+        v.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        v.model.toLowerCase().includes(searchTerm.toLowerCase())
+      ));
+    return matchesSearch;
+  });
+
+  const sortedClients = [...filteredClients].sort((a, b) => {
+    if (!sortBy) return 0;
+    
+    switch (sortBy) {
+      case 'company_name':
+        return a.company.name.localeCompare(b.company.name);
+      case 'delivery_date':
+        const dateA = new Date(a.delivery_date || '');
+        const dateB = new Date(b.delivery_date || '');
+        return dateB - dateA;
+      case 'contract_end_date':
+        const endDateA = new Date(a.contract_end_date || '');
+        const endDateB = new Date(b.contract_end_date || '');
+        return endDateA - endDateB;
+      case 'commission_total':
+        const getTotalCommission = (client) => {
+          return client.vehicles?.reduce((total, vehicle) => {
+            const commission = vehicle.commission_agence || '';
+            const numbers = commission.match(/\d+/);
+            return total + (numbers ? parseInt(numbers[0]) : 0);
+          }, 0) || 0;
+        };
+        return getTotalCommission(b) - getTotalCommission(a);
+      default:
+        return 0;
+    }
+  });
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-3xl font-bold text-green-900">🎯 Clients (Livrés)</h2>
+          <p className="text-green-600 mt-1">
+            {sortedClients.length} client{sortedClients.length > 1 ? 's' : ''} livré{sortedClients.length > 1 ? 's' : ''}
+            {sortBy && (
+              <span className="ml-2 text-green-700 font-medium">
+                • Trié par {
+                  sortBy === 'company_name' ? 'nom société' :
+                  sortBy === 'delivery_date' ? 'date livraison' :
+                  sortBy === 'contract_end_date' ? 'fin contrat' :
+                  sortBy === 'commission_total' ? 'commission' : sortBy
+                }
+              </span>
+            )}
+          </p>
+        </div>
+        <div className="bg-green-50 p-4 rounded-lg">
+          <p className="text-sm text-green-700">
+            ✅ Affaires finalisées et véhicules livrés
+          </p>
+        </div>
+      </div>
+
+      {/* Filtres et tri */}
+      <div className="flex flex-wrap gap-4 mb-6">
+        <input
+          type="text"
+          placeholder="Rechercher un client..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="flex-1 min-w-64 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+        />
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 bg-gradient-to-r from-green-50 to-green-100"
+        >
+          <option value="">📊 Trier par...</option>
+          <option value="company_name">🏢 Nom société (A-Z)</option>
+          <option value="delivery_date">📅 Date livraison (Plus récent)</option>
+          <option value="contract_end_date">⏰ Fin contrat (Plus proche)</option>
+          <option value="commission_total">💰 Commission (Plus élevée)</option>
+        </select>
+      </div>
+
+      {/* Table des clients */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-green-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Client</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Contact</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Véhicule livré</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Livraison</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Fin contrat</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Commission</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {sortedClients.length > 0 ? (
+                sortedClients.map((client) => (
+                  <tr key={client.id} className="hover:bg-green-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{client.company.name}</div>
+                        <div className="text-sm text-gray-500">{client.company.email}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {client.contact.first_name} {client.contact.last_name}
+                        </div>
+                        <div className="text-sm text-gray-500">{client.contact.phone}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {client.vehicles && client.vehicles.length > 0 ? (
+                          <>
+                            <div className="font-medium">
+                              {client.vehicles[0].brand} {client.vehicles[0].model}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {client.vehicles[0].carburant}
+                              {client.vehicles[0].tarif_mensuel && (
+                                <span className="ml-2 text-green-600">{client.vehicles[0].tarif_mensuel}</span>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          <span className="text-gray-400">Véhicule non spécifié</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div className="font-medium text-green-700">
+                        {client.delivery_date ? 
+                          new Date(client.delivery_date).toLocaleDateString('fr-FR') : 
+                          'Non définie'
+                        }
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div>
+                        {client.contract_end_date ? 
+                          new Date(client.contract_end_date).toLocaleDateString('fr-FR') : 
+                          'Non calculée'
+                        }
+                      </div>
+                      {client.contract_end_date && (
+                        <div className="text-xs text-gray-500">
+                          {Math.ceil((new Date(client.contract_end_date) - new Date()) / (1000 * 60 * 60 * 24))} jours restants
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {client.vehicles && client.vehicles[0]?.commission_agence ? (
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {client.vehicles[0].commission_agence}
+                          </div>
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            client.vehicles[0].payment_status === 'paye' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-orange-100 text-orange-800'
+                          }`}>
+                            {client.vehicles[0].payment_status === 'paye' ? '✅ Payé' : '⏳ En attente'}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400">Non définie</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                    <div className="text-4xl text-gray-300 mb-4">🎯</div>
+                    <p className="text-lg font-medium">Aucun client livré pour le moment</p>
+                    <p className="text-sm">Les leads avec le statut "Livrée" apparaîtront ici</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Main App Component  
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
