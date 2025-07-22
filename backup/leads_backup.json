@@ -202,7 +202,7 @@
         "payment_status": "paye"
       }
     ],
-    "status": "livree",
+    "status": "relance",
     "note": "Démonstration logique conditionnelle",
     "delivery_date": null,
     "assigned_to_commercial": "Matthews",
