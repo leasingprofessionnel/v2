@@ -498,6 +498,166 @@ class CRMAPITester:
         except Exception as e:
             return self.log_test("Get Lead Activities", False, f"Error: {str(e)}")
 
+    def test_pdf_export(self):
+        """Test PDF export functionality for leads"""
+        if not self.created_lead_ids:
+            return self.log_test("PDF Export", False, "No lead ID available")
+        
+        lead_id = self.created_lead_ids[0]
+        try:
+            response = requests.get(f"{self.base_url}/leads/{lead_id}/pdf", 
+                                  headers={'Accept': 'application/pdf'}, timeout=30)
+            success = response.status_code == 200
+            if success:
+                content_type = response.headers.get('content-type', '')
+                is_pdf = 'application/pdf' in content_type
+                content_length = len(response.content)
+                has_content = content_length > 1000  # PDF should be at least 1KB
+                
+                success = is_pdf and has_content
+                details = f"Status: {response.status_code}, Content-Type: {content_type}, Size: {content_length} bytes, Valid PDF: {is_pdf and has_content}"
+            else:
+                details = f"Status: {response.status_code}, Response: {response.text[:200]}"
+            return self.log_test("PDF Export", success, details)
+        except Exception as e:
+            return self.log_test("PDF Export", False, f"Error: {str(e)}")
+
+    def test_create_reminder(self):
+        """Test creating reminders"""
+        if not self.created_lead_ids:
+            return self.log_test("Create Reminder", False, "No lead ID available")
+        
+        lead_id = self.created_lead_ids[0]
+        reminder_date = (datetime.now() + timedelta(days=7)).isoformat()
+        
+        reminder_data = {
+            "lead_id": lead_id,
+            "title": "Relance client BMW Série 3",
+            "description": "Appeler le client pour faire le point sur l'offre BMW Série 3. Vérifier si des ajustements sont nécessaires.",
+            "reminder_date": reminder_date
+        }
+
+        try:
+            response = requests.post(f"{self.base_url}/reminders", 
+                                   json=reminder_data, 
+                                   headers=self.headers, 
+                                   timeout=10)
+            success = response.status_code == 200
+            if success:
+                data = response.json()
+                reminder_id = data.get('reminder', {}).get('id')
+                if reminder_id:
+                    self.created_reminder_ids.append(reminder_id)
+                
+                title_ok = data.get('reminder', {}).get('title') == reminder_data['title']
+                lead_id_ok = data.get('reminder', {}).get('lead_id') == lead_id
+                
+                details = f"Status: {response.status_code}, Reminder ID: {reminder_id}, Title: {title_ok}, Lead ID: {lead_id_ok}"
+            else:
+                details = f"Status: {response.status_code}, Response: {response.text[:200]}"
+            return self.log_test("Create Reminder", success, details)
+        except Exception as e:
+            return self.log_test("Create Reminder", False, f"Error: {str(e)}")
+
+    def test_get_reminders(self):
+        """Test getting all reminders"""
+        try:
+            response = requests.get(f"{self.base_url}/reminders", headers=self.headers, timeout=10)
+            success = response.status_code == 200
+            if success:
+                data = response.json()
+                reminders_count = len(data) if isinstance(data, list) else 0
+                has_created_reminder = any(r.get('id') in self.created_reminder_ids for r in data) if self.created_reminder_ids else True
+                
+                details = f"Status: {response.status_code}, Reminders count: {reminders_count}, Has created: {has_created_reminder}"
+            else:
+                details = f"Status: {response.status_code}"
+            return self.log_test("Get Reminders", success, details)
+        except Exception as e:
+            return self.log_test("Get Reminders", False, f"Error: {str(e)}")
+
+    def test_calendar_reminders(self):
+        """Test calendar reminders with date filtering"""
+        try:
+            # Test default (30 days)
+            response = requests.get(f"{self.base_url}/calendar/reminders", headers=self.headers, timeout=10)
+            success = response.status_code == 200
+            if success:
+                data = response.json()
+                reminders_count = len(data) if isinstance(data, list) else 0
+                
+                # Test with custom days parameter
+                response2 = requests.get(f"{self.base_url}/calendar/reminders?days=7", headers=self.headers, timeout=10)
+                success2 = response2.status_code == 200
+                if success2:
+                    data2 = response2.json()
+                    reminders_7days = len(data2) if isinstance(data2, list) else 0
+                    
+                    # 7-day filter should return same or fewer results than 30-day
+                    filter_works = reminders_7days <= reminders_count
+                    
+                    details = f"Status: {response.status_code}, 30-day: {reminders_count}, 7-day: {reminders_7days}, Filter works: {filter_works}"
+                    success = success and success2 and filter_works
+                else:
+                    details = f"Status: {response.status_code}, 7-day test failed: {response2.status_code}"
+            else:
+                details = f"Status: {response.status_code}"
+            return self.log_test("Calendar Reminders", success, details)
+        except Exception as e:
+            return self.log_test("Calendar Reminders", False, f"Error: {str(e)}")
+
+    def test_comprehensive_car_brands(self):
+        """Test comprehensive car brands database (90+ brands)"""
+        try:
+            response = requests.get(f"{self.base_url}/config", headers=self.headers, timeout=10)
+            success = response.status_code == 200
+            if success:
+                data = response.json()
+                car_brands = data.get('car_brands', {})
+                
+                # Test for 90+ brands
+                brand_count = len(car_brands)
+                has_90_plus = brand_count >= 90
+                
+                # Test specific brands mentioned in the requirements
+                test_brands = [
+                    "Abarth", "BMW", "Mercedes", "Audi", "Porsche", "Ferrari", 
+                    "Peugeot", "Renault", "Citroën", "DS", "Volkswagen", "Toyota",
+                    "Tesla", "Lamborghini", "Maserati", "Jaguar", "Land Rover",
+                    "Volvo", "Lexus", "Infiniti", "Genesis", "McLaren", "Bentley",
+                    "Rolls-Royce", "Bugatti", "Alpine", "Lotus", "Morgan"
+                ]
+                
+                brands_found = sum(1 for brand in test_brands if brand in car_brands)
+                brands_coverage = brands_found / len(test_brands)
+                
+                # Test models for key brands
+                key_models_test = [
+                    ("BMW", ["Série 1", "Série 3", "X1", "X3", "M3"]),
+                    ("Mercedes", ["Classe A", "Classe C", "GLA", "GLC", "AMG GT"]),
+                    ("Audi", ["A1", "A3", "Q2", "Q3", "RS3"]),
+                    ("Peugeot", ["108", "208", "308", "2008", "3008"]),
+                    ("Tesla", ["Model S", "Model 3", "Model X", "Model Y"])
+                ]
+                
+                models_ok = True
+                for brand, expected_models in key_models_test:
+                    if brand in car_brands:
+                        brand_models = car_brands[brand]
+                        if not any(model in brand_models for model in expected_models):
+                            models_ok = False
+                            break
+                
+                success = has_90_plus and brands_coverage >= 0.8 and models_ok
+                details = (f"Status: {response.status_code}, Brands: {brand_count} (90+: {has_90_plus}), "
+                          f"Coverage: {brands_coverage:.1%} ({brands_found}/{len(test_brands)}), "
+                          f"Models: {models_ok}")
+            else:
+                details = f"Status: {response.status_code}"
+            return self.log_test("Comprehensive Car Brands (90+)", success, details)
+        except Exception as e:
+            return self.log_test("Comprehensive Car Brands (90+)", False, f"Error: {str(e)}")
+
     def cleanup_test_data(self):
         """Clean up created test data"""
         cleaned = 0
