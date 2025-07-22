@@ -1,38 +1,313 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Custom styles pour le CRM LLD */
 .App {
-    text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Animations personnalisées */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+/* Styles pour les status badges */
+.status-badge {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-all;
 }
 
-.App-link {
-    color: #61dafb;
+/* Hover effects personnalisés */
+.hover-lift {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles pour le gradient French Tech */
+.french-gradient {
+  background: linear-gradient(135deg, #2563eb 0%, #ffffff 50%, #dc2626 100%);
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Responsive table styles */
+@media (max-width: 768px) {
+  .responsive-table {
+    font-size: 14px;
+  }
+  
+  .responsive-table td {
+    padding: 8px 4px;
+  }
+}
+
+/* Loading animation */
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Form styles enhancement */
+.form-input {
+  @apply w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all;
+}
+
+.form-select {
+  @apply w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all font-medium;
+}
+
+.btn-secondary {
+  @apply px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:ring-4 focus:ring-gray-200 transition-all font-medium;
+}
+
+.btn-danger {
+  @apply px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:ring-4 focus:ring-red-200 transition-all font-medium;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white rounded-xl shadow-md border border-gray-100 transition-all;
+}
+
+.card:hover {
+  @apply shadow-lg;
+}
+
+/* Status colors mapping */
+.status-premier-contact { background-color: #94a3b8; }
+.status-relance { background-color: #f59e0b; }
+.status-attribue { background-color: #06b6d4; }
+.status-offre { background-color: #8b5cf6; }
+.status-attente-document { background-color: #f97316; }
+.status-etude-en-cours { background-color: #3b82f6; }
+.status-accord { background-color: #10b981; }
+.status-livree { background-color: #22c55e; }
+.status-perdu { background-color: #ef4444; }
+
+/* Dashboard grid improvements */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Pipeline visualization */
+.pipeline-step {
+  @apply relative bg-white rounded-lg p-4 shadow-sm border-2 border-transparent transition-all;
+}
+
+.pipeline-step:hover {
+  @apply border-blue-200 shadow-md;
+}
+
+.pipeline-step::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid #e5e7eb;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+.pipeline-step:last-child::after {
+  display: none;
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 640px) {
+  .mobile-stack > * {
+    margin-bottom: 1rem;
+  }
+  
+  .mobile-full {
+    width: 100%;
+  }
+  
+  .mobile-text-sm {
+    font-size: 0.875rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break {
+    page-break-after: always;
+  }
+}
+
+/* Accessibility improvements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus indicators */
+.focus-visible {
+  @apply ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Toast notifications styles */
+.toast {
+  @apply fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm;
+}
+
+.toast-success {
+  @apply bg-green-500 text-white;
+}
+
+.toast-error {
+  @apply bg-red-500 text-white;
+}
+
+.toast-info {
+  @apply bg-blue-500 text-white;
+}
+
+/* Calendar styles */
+.calendar-day {
+  @apply p-2 border border-gray-200 min-h-24 hover:bg-gray-50 cursor-pointer;
+}
+
+.calendar-event {
+  @apply text-xs p-1 rounded bg-blue-100 text-blue-800 mb-1;
+}
+
+/* Modal overlay */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white rounded-xl shadow-2xl max-w-4xl w-full m-4 max-h-96vh overflow-y-auto;
+}
+
+/* French tricolor accent */
+.tricolor-border {
+  border-top: 3px solid #2563eb;
+  border-bottom: 3px solid #dc2626;
+}
+
+.tricolor-text {
+  background: linear-gradient(90deg, #2563eb 0%, #ffffff 50%, #dc2626 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Data visualization */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Loading states */
+.skeleton {
+  @apply animate-pulse bg-gray-200 rounded;
+}
+
+.skeleton-text {
+  @apply h-4 bg-gray-200 rounded animate-pulse;
+}
+
+.skeleton-circle {
+  @apply w-12 h-12 bg-gray-200 rounded-full animate-pulse;
+}
+
+/* Export button styles */
+.export-button {
+  @apply inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500;
+}
+
+/* Search highlight */
+.search-highlight {
+  background-color: yellow;
+  font-weight: bold;
+}
+
+/* Timeline styles */
+.timeline {
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e5e7eb;
+}
+
+.timeline-item {
+  position: relative;
+  margin-left: 40px;
+  padding-bottom: 2rem;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -28px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  background: #3b82f6;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 0 0 2px #e5e7eb;
 }
