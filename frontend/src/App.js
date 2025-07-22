@@ -897,7 +897,27 @@ const LeadsView = ({ leads, config, onRefresh }) => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-gray-900">Gestion des Leads</h2>
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900">Gestion des Leads</h2>
+          <p className="text-gray-600 mt-1">
+            {sortedLeads.length} lead{sortedLeads.length > 1 ? 's' : ''} affiché{sortedLeads.length > 1 ? 's' : ''}
+            {sortBy && (
+              <span className="ml-2 text-blue-600 font-medium">
+                • Trié par {
+                  sortBy === 'company_name' ? 'nom de société' :
+                  sortBy === 'contact_name' ? 'contact' :
+                  sortBy === 'status' ? 'statut' :
+                  sortBy === 'commercial' ? 'commercial' :
+                  sortBy === 'prestataire' ? 'prestataire' :
+                  sortBy === 'vehicle_brand' ? 'marque véhicule' :
+                  sortBy === 'created_at' ? 'date (récent)' :
+                  sortBy === 'created_at_asc' ? 'date (ancien)' :
+                  sortBy === 'commission_total' ? 'commission' : sortBy
+                }
+              </span>
+            )}
+          </p>
+        </div>
         <button
           onClick={() => setShowForm(true)}
           className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors font-medium"
