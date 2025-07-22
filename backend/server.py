@@ -74,7 +74,10 @@ class Reminder(BaseModel):
     title: str
     description: Optional[str] = None
     reminder_date: str
+    priority: str = "medium"  # low, medium, high, urgent
+    reminder_type: str = "general"  # general, call, email, meeting, follow_up
     completed: bool = False
+    completed_at: Optional[str] = None
     created_at: Optional[str] = None
 
 class Lead(BaseModel):
