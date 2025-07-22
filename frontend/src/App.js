@@ -470,14 +470,15 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
             </select>
           </div>
 
-          {/* Vehicles Section */}
-          <div className="bg-red-50 p-4 rounded-lg">
-            <h4 className="text-lg font-semibold mb-3 text-red-900">🚗 Véhicules</h4>
-            {formData.vehicles.map((vehicle, index) => {
-              const selectedBrandModels = config.car_brands?.[vehicle.brand] || [];
-              return (
-                <div key={index} className="border-2 border-red-200 p-4 rounded-lg mb-4 bg-white">
-                  <h5 className="font-medium text-red-800 mb-3">Véhicule {index + 1}</h5>
+          {/* Vehicles Section - Affichée seulement si vehicleCount > 0 */}
+          {vehicleCount > 0 ? (
+            <div className="bg-red-50 p-4 rounded-lg">
+              <h4 className="text-lg font-semibold mb-3 text-red-900">🚗 Véhicules</h4>
+              {formData.vehicles.map((vehicle, index) => {
+                const selectedBrandModels = config.car_brands?.[vehicle.brand] || [];
+                return (
+                  <div key={index} className="border-2 border-red-200 p-4 rounded-lg mb-4 bg-white">
+                    <h5 className="font-medium text-red-800 mb-3">Véhicule {index + 1}</h5>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
