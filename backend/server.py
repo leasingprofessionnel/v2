@@ -84,12 +84,13 @@ class Lead(BaseModel):
     vehicles: List[Vehicle] = []
     status: str = "a_contacter"  # Nouveau statut par défaut
     note: Optional[str] = None
+    lead_creation_date: Optional[str] = None  # Date de création modifiable du lead
     delivery_date: Optional[str] = None
     contract_end_date: Optional[str] = None
     assigned_to_commercial: Optional[str] = None
     assigned_to_prestataire: Optional[str] = None
     reminders: List[Reminder] = []
-    created_at: Optional[str] = None
+    created_at: Optional[str] = None  # Timestamp automatique système
 
 class LeadCreate(BaseModel):
     company: Company
