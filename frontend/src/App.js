@@ -1171,9 +1171,9 @@ const Calendar = ({ leads }) => {
     }
   };
 
-  const handleToggleCompleted = async (reminderId, completed) => {
+  const handleToggleCompleted = async (reminderId) => {
     try {
-      await axios.put(`${API}/reminders/${reminderId}`, { completed: !completed });
+      await axios.put(`${API}/reminders/${reminderId}/complete`);
       fetchReminders(); // Recharger la liste
     } catch (error) {
       console.error('Error updating reminder:', error);
