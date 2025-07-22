@@ -410,14 +410,15 @@ class CRMAPITester:
 
     def test_create_activity(self):
         """Test activity creation"""
-        if not self.created_lead_id:
+        if not self.created_lead_ids:
             return self.log_test("Create Activity", False, "No lead ID available")
         
+        lead_id = self.created_lead_ids[0]
         activity_data = {
-            "lead_id": self.created_lead_id,
+            "lead_id": lead_id,
             "activity_type": "note",
             "title": "Premier contact effectué",
-            "description": "Client intéressé par le véhicule Peugeot 3008"
+            "description": "Client intéressé par le véhicule BMW Série 3"
         }
 
         try:
@@ -438,11 +439,12 @@ class CRMAPITester:
 
     def test_get_lead_activities(self):
         """Test getting activities for a lead"""
-        if not self.created_lead_id:
+        if not self.created_lead_ids:
             return self.log_test("Get Lead Activities", False, "No lead ID available")
         
+        lead_id = self.created_lead_ids[0]
         try:
-            response = requests.get(f"{self.base_url}/activities/{self.created_lead_id}", 
+            response = requests.get(f"{self.base_url}/activities/{lead_id}", 
                                   headers=self.headers, timeout=10)
             success = response.status_code == 200
             if success:
@@ -455,19 +457,20 @@ class CRMAPITester:
         except Exception as e:
             return self.log_test("Get Lead Activities", False, f"Error: {str(e)}")
 
-    def test_delete_lead(self):
-        """Test lead deletion (run last)"""
-        if not self.created_lead_id:
-            return self.log_test("Delete Lead", False, "No lead ID available")
+    def cleanup_test_data(self):
+        """Clean up created test data"""
+        cleaned = 0
+        for lead_id in self.created_lead_ids:
+            try:
+                response = requests.delete(f"{self.base_url}/leads/{lead_id}", 
+                                         headers=self.headers, timeout=10)
+                if response.status_code == 200:
+                    cleaned += 1
+            except:
+                pass
         
-        try:
-            response = requests.delete(f"{self.base_url}/leads/{self.created_lead_id}", 
-                                     headers=self.headers, timeout=10)
-            success = response.status_code == 200
-            details = f"Status: {response.status_code}"
-            return self.log_test("Delete Lead", success, details)
-        except Exception as e:
-            return self.log_test("Delete Lead", False, f"Error: {str(e)}")
+        details = f"Cleaned {cleaned}/{len(self.created_lead_ids)} test leads"
+        return self.log_test("Cleanup Test Data", cleaned == len(self.created_lead_ids), details)
 
     def run_all_tests(self):
         """Run all API tests in sequence"""
