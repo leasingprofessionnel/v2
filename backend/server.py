@@ -425,14 +425,15 @@ async def create_lead(lead_data: LeadCreate):
         contact=lead_data.contact,
         vehicles=lead_data.vehicles,
         note=lead_data.note,
+        status=lead_data.status or "a_contacter",
+        delivery_date=lead_data.delivery_date,
         assigned_to_commercial=lead_data.assigned_to_commercial,
         assigned_to_prestataire=lead_data.assigned_to_prestataire,
         created_at=datetime.now().isoformat()
     )
     
     # 📅 CALCUL AUTOMATIQUE DE LA DATE DE FIN DE CONTRAT si données disponibles
-    if hasattr(lead_data, 'delivery_date') and lead_data.delivery_date and lead_data.vehicles:
-        lead.delivery_date = lead_data.delivery_date
+    if lead_data.delivery_date and lead_data.vehicles:
         contract_duration = lead_data.vehicles[0].contract_duration
         if contract_duration:
             lead.contract_end_date = calculate_contract_end_date(lead_data.delivery_date, contract_duration)
