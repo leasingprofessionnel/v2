@@ -731,8 +731,6 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
                     </p>
                   )}
                 </div>
-                  />
-                </div>
               </div>
             </div>
           )}
