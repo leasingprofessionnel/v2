@@ -1,0 +1,20 @@
+{
+  "name": "crm-leasinprofessionnel",
+  "version": "1.0.0",
+  "description": "CRM LEASINPROFESSIONNEL.FR - Système de gestion des leads LLD automobile",
+  "main": "backend/server.py",
+  "scripts": {
+    "start": "./start.sh",
+    "dev": "./start.sh",
+    "backend": "cd backend && python server.py",
+    "frontend": "cd frontend && npm start",
+    "install-all": "cd backend && pip install -r requirements.txt && cd ../frontend && npm install"
+  },
+  "keywords": ["crm", "leasing", "automobile", "lld"],
+  "author": "LEASINPROFESSIONNEL.FR",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "python": ">=3.11.0"
+  }
+}
