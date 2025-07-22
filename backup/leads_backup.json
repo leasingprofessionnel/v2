@@ -519,5 +519,73 @@
     "assigned_to_prestataire": null,
     "reminders": [],
     "created_at": "2025-07-22T13:26:26.268335"
+  },
+  "9aac901d": {
+    "id": "9aac901d",
+    "company": {
+      "name": "Client BYD Seal",
+      "siret": null,
+      "email": "seal@byd.fr",
+      "phone": null
+    },
+    "contact": {
+      "first_name": "Marie",
+      "last_name": "Premium",
+      "email": "marie@premium.fr",
+      "phone": null
+    },
+    "vehicles": [
+      {
+        "brand": "BYD",
+        "model": "Seal",
+        "carburant": "electrique",
+        "contract_duration": 48,
+        "annual_mileage": 25000,
+        "tarif_mensuel": "650€",
+        "commission_agence": null,
+        "payment_status": "en_attente"
+      }
+    ],
+    "status": "a_contacter",
+    "note": "Intérêt pour berline électrique haut de gamme BYD",
+    "delivery_date": null,
+    "assigned_to_commercial": null,
+    "assigned_to_prestataire": null,
+    "reminders": [],
+    "created_at": "2025-07-22T13:26:37.140983"
+  },
+  "3ce3035d": {
+    "id": "3ce3035d",
+    "company": {
+      "name": "Famille Tang",
+      "siret": null,
+      "email": "famille@tang.fr",
+      "phone": null
+    },
+    "contact": {
+      "first_name": "Jean",
+      "last_name": "Famille",
+      "email": "jean@famille.fr",
+      "phone": null
+    },
+    "vehicles": [
+      {
+        "brand": "BYD",
+        "model": "Tang EV",
+        "carburant": "electrique",
+        "contract_duration": 36,
+        "annual_mileage": 15000,
+        "tarif_mensuel": "720€",
+        "commission_agence": null,
+        "payment_status": "en_attente"
+      }
+    ],
+    "status": "a_contacter",
+    "note": "Recherche SUV électrique pour famille nombreuse",
+    "delivery_date": null,
+    "assigned_to_commercial": null,
+    "assigned_to_prestataire": null,
+    "reminders": [],
+    "created_at": "2025-07-22T13:26:37.174898"
   }
 }
