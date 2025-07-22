@@ -1001,6 +1001,16 @@ const LeadsView = ({ leads, config, onRefresh }) => {
         const dateBAsc = new Date(b.created_at || '');
         return dateAAsc - dateBAsc; // Plus ancien en premier
       
+      case 'lead_creation_date':
+        const leadDateA = new Date(a.lead_creation_date || '');
+        const leadDateB = new Date(b.lead_creation_date || '');
+        return leadDateB - leadDateA; // Plus récent en premier
+      
+      case 'lead_creation_date_asc':
+        const leadDateAAsc = new Date(a.lead_creation_date || '');
+        const leadDateBAsc = new Date(b.lead_creation_date || '');
+        return leadDateAAsc - leadDateBAsc; // Plus ancien en premier
+      
       case 'commission_total':
         const getTotalCommission = (lead) => {
           return lead.vehicles?.reduce((total, vehicle) => {
