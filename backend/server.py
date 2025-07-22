@@ -131,6 +131,14 @@ class VehicleCreate(BaseModel):
     carburant: CarburantType
     contract_duration: int
     annual_mileage: int
+    tarif_mensuel: Optional[str] = None
+    commission_agence: Optional[str] = None
+
+class ReminderCreate(BaseModel):
+    lead_id: str
+    title: str
+    description: Optional[str] = None
+    reminder_date: datetime
 
 class ActivityCreate(BaseModel):
     lead_id: str
