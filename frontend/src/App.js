@@ -875,6 +875,20 @@ const LeadsTable = ({ leads, onEdit, onDelete, onStatusChange, statusColors, con
                 </select>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <div className="font-medium">
+                  {lead.lead_creation_date ? 
+                    new Date(lead.lead_creation_date).toLocaleDateString('fr-FR') : 
+                    'Non définie'
+                  }
+                </div>
+                <div className="text-xs text-gray-500">
+                  {lead.created_at ? 
+                    `Système: ${new Date(lead.created_at).toLocaleDateString('fr-FR')}` : 
+                    ''
+                  }
+                </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 <div>{lead.assigned_to_commercial}</div>
                 <div className="text-gray-500">{lead.assigned_to_prestataire}</div>
               </td>
