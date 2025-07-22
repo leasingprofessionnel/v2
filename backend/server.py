@@ -52,6 +52,10 @@ class CarburantType(str, Enum):
     HYBRIDE = "hybride"
     ELECTRIQUE = "electrique"
 
+class PaymentStatus(str, Enum):
+    EN_ATTENTE = "en_attente"
+    PAYE = "paye"
+
 # Models
 class Company(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
