@@ -117,6 +117,7 @@ CAR_BRANDS = {
     "Bentley": ["Bentayga", "Continental", "Flying Spur", "Mulsanne"],
     "BMW": ["Série 1", "Série 2", "Série 3", "Série 4", "Série 5", "Série 6", "Série 7", "Série 8", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "Z4", "i3", "i4", "iX", "iX3", "M2", "M3", "M4", "M5", "M8", "X3 M", "X4 M", "X5 M", "X6 M"],
     "Bugatti": ["Chiron", "Veyron"],
+    "BYD": ["Atto 3", "Han", "Tang", "Song", "Qin", "Seal", "Dolphin", "Yuan Plus", "Han EV", "Tang EV", "Song Plus", "e6", "K9", "T3"],
     "Cadillac": ["Escalade", "XT4", "XT5", "XT6", "CT4", "CT5"],
     "Caterham": ["Seven", "620R"],
     "Chevrolet": ["Camaro", "Corvette", "Silverado", "Tahoe", "Suburban", "Cruze", "Aveo", "Captiva", "Spark", "Trax"],
