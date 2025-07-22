@@ -338,6 +338,29 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Date de création du lead - En haut */}
+          <div className="bg-gray-50 p-4 rounded-lg border-2 border-gray-200">
+            <div className="flex items-center space-x-4">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  📅 Date de création du lead
+                </label>
+                <input
+                  type="date"
+                  value={formData.lead_creation_date || ''}
+                  onChange={(e) => setFormData({ ...formData, lead_creation_date: e.target.value })}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                <p className="font-medium text-blue-800 mb-1">💡 Information</p>
+                <p>Cette date permet de trier et filtrer vos leads par date de création.</p>
+                <p className="text-xs mt-1">Par défaut: date du jour</p>
+              </div>
+            </div>
+          </div>
+
           {/* Company Section */}
           <div className="bg-blue-50 p-4 rounded-lg">
             <h4 className="text-lg font-semibold mb-3 text-blue-900">🏢 Société</h4>
