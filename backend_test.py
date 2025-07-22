@@ -46,7 +46,7 @@ class CRMAPITester:
             return self.log_test("API Root", False, f"Error: {str(e)}")
 
     def test_get_config(self):
-        """Test configuration endpoint"""
+        """Test configuration endpoint with new features"""
         try:
             response = requests.get(f"{self.base_url}/config", headers=self.headers, timeout=10)
             success = response.status_code == 200
@@ -54,40 +54,59 @@ class CRMAPITester:
                 data = response.json()
                 required_keys = ['prestataires', 'commerciaux', 'car_brands', 'contract_durations', 'annual_mileages', 'status_colors']
                 has_all_keys = all(key in data for key in required_keys)
-                success = has_all_keys
-                details = f"Status: {response.status_code}, Keys present: {has_all_keys}"
+                
+                # Test new commercials
+                commerciaux = data.get('commerciaux', [])
+                expected_commerciaux = ["Matthews", "Sauveur", "Autre"]
+                commerciaux_ok = all(c in commerciaux for c in expected_commerciaux)
+                
+                # Test extended car brands
+                car_brands = data.get('car_brands', {})
+                brand_count = len(car_brands)
+                
+                # Test specific premium brands
+                premium_brands = ["BMW", "Mercedes", "Audi", "Porsche", "Ferrari"]
+                premium_ok = all(brand in car_brands for brand in premium_brands)
+                
+                # Test French brands
+                french_brands = ["Peugeot", "Renault", "Citroën"]
+                french_ok = all(brand in car_brands for brand in french_brands)
+                
+                success = has_all_keys and commerciaux_ok and brand_count >= 50 and premium_ok and french_ok
+                details = f"Status: {response.status_code}, Keys: {has_all_keys}, Commerciaux: {commerciaux_ok} ({commerciaux}), Brands: {brand_count}, Premium: {premium_ok}, French: {french_ok}"
             else:
                 details = f"Status: {response.status_code}"
-            return self.log_test("Get Config", success, details)
+            return self.log_test("Get Config (New Features)", success, details)
         except Exception as e:
-            return self.log_test("Get Config", False, f"Error: {str(e)}")
+            return self.log_test("Get Config (New Features)", False, f"Error: {str(e)}")
 
-    def test_create_lead(self):
-        """Test lead creation"""
+    def test_create_lead_single_vehicle(self):
+        """Test creating a lead with single vehicle and note"""
         lead_data = {
             "company": {
-                "name": "Test Auto SARL",
+                "name": "Entreprise Test SARL",
                 "siret": "12345678901234",
                 "address": "123 Rue de la Paix, 75001 Paris",
                 "phone": "01.23.45.67.89",
-                "email": "contact@testauto.fr"
+                "email": "contact@entreprise-test.fr"
             },
             "contact": {
                 "first_name": "Jean",
                 "last_name": "Dupont",
-                "email": "jean.dupont@testauto.fr",
+                "email": "jean.dupont@entreprise-test.fr",
                 "phone": "06.12.34.56.78",
-                "position": "Directeur"
+                "position": "Directeur Général"
             },
-            "vehicle": {
-                "brand": "Peugeot",
-                "model": "3008",
+            "vehicles": [{
+                "brand": "BMW",
+                "model": "Série 3",
                 "carburant": "diesel",
                 "contract_duration": 36,
-                "annual_mileage": 15000
-            },
-            "assigned_to_prestataire": "Localease",
-            "assigned_to_commercial": "Jean Dupont"
+                "annual_mileage": 20000
+            }],
+            "note": "Client intéressé par une flotte de véhicules. Budget prévu: 50k€. Timing: Q2 2025. Préfère les véhicules allemands.",
+            "assigned_to_prestataire": "Leaseplan",
+            "assigned_to_commercial": "Matthews"
         }
 
         try:
@@ -98,13 +117,146 @@ class CRMAPITester:
             success = response.status_code == 200
             if success:
                 data = response.json()
-                self.created_lead_id = data.get('id')
-                details = f"Status: {response.status_code}, Lead ID: {self.created_lead_id}"
+                lead_id = data.get('id')
+                if lead_id:
+                    self.created_lead_ids.append(lead_id)
+                
+                # Verify new features
+                note_ok = data.get('note') == lead_data['note']
+                commercial_ok = data.get('assigned_to_commercial') == 'Matthews'
+                vehicle_ok = (data.get('vehicles', [{}])[0].get('brand') == 'BMW' and
+                            data.get('vehicles', [{}])[0].get('model') == 'Série 3')
+                
+                details = f"Status: {response.status_code}, Lead ID: {lead_id}, Note: {note_ok}, Commercial: {commercial_ok}, Vehicle: {vehicle_ok}"
             else:
                 details = f"Status: {response.status_code}, Response: {response.text[:200]}"
-            return self.log_test("Create Lead", success, details)
+            return self.log_test("Create Lead (Single Vehicle + Note)", success, details)
         except Exception as e:
-            return self.log_test("Create Lead", False, f"Error: {str(e)}")
+            return self.log_test("Create Lead (Single Vehicle + Note)", False, f"Error: {str(e)}")
+
+    def test_create_lead_multi_vehicle(self):
+        """Test creating a lead with multiple vehicles"""
+        lead_data = {
+            "company": {
+                "name": "Multi-Fleet Corp",
+                "siret": "98765432109876",
+                "address": "456 Avenue des Champs, 75008 Paris",
+                "phone": "01.98.76.54.32",
+                "email": "fleet@multifleet.fr"
+            },
+            "contact": {
+                "first_name": "Marie",
+                "last_name": "Martin",
+                "email": "marie.martin@multifleet.fr",
+                "phone": "06.98.76.54.32",
+                "position": "Responsable Flotte"
+            },
+            "vehicles": [
+                {
+                    "brand": "BMW",
+                    "model": "Série 3",
+                    "carburant": "diesel",
+                    "contract_duration": 36,
+                    "annual_mileage": 25000
+                },
+                {
+                    "brand": "Mercedes",
+                    "model": "Classe C",
+                    "carburant": "hybride",
+                    "contract_duration": 48,
+                    "annual_mileage": 20000
+                },
+                {
+                    "brand": "Audi",
+                    "model": "A4",
+                    "carburant": "essence",
+                    "contract_duration": 36,
+                    "annual_mileage": 15000
+                }
+            ],
+            "note": "Commande groupée pour renouvellement de flotte. Négociation en cours sur les tarifs. Livraison souhaitée avant fin Q1.",
+            "assigned_to_prestataire": "ALD Automotive",
+            "assigned_to_commercial": "Sauveur"
+        }
+
+        try:
+            response = requests.post(f"{self.base_url}/leads", 
+                                   json=lead_data, 
+                                   headers=self.headers, 
+                                   timeout=10)
+            success = response.status_code == 200
+            if success:
+                data = response.json()
+                lead_id = data.get('id')
+                if lead_id:
+                    self.created_lead_ids.append(lead_id)
+                
+                vehicles = data.get('vehicles', [])
+                vehicle_count_ok = len(vehicles) == 3
+                brands_ok = [v.get('brand') for v in vehicles] == ['BMW', 'Mercedes', 'Audi']
+                commercial_ok = data.get('assigned_to_commercial') == 'Sauveur'
+                
+                details = f"Status: {response.status_code}, Lead ID: {lead_id}, Vehicles: {len(vehicles)}/3, Brands: {brands_ok}, Commercial: {commercial_ok}"
+            else:
+                details = f"Status: {response.status_code}, Response: {response.text[:200]}"
+            return self.log_test("Create Lead (Multi Vehicle)", success, details)
+        except Exception as e:
+            return self.log_test("Create Lead (Multi Vehicle)", False, f"Error: {str(e)}")
+
+    def test_search_in_notes(self):
+        """Test search functionality in notes"""
+        try:
+            response = requests.get(f"{self.base_url}/leads?search=flotte", 
+                                  headers=self.headers, timeout=10)
+            success = response.status_code == 200
+            if success:
+                data = response.json()
+                results_count = len(data) if isinstance(data, list) else 0
+                # Should find leads with "flotte" in notes
+                details = f"Status: {response.status_code}, Search 'flotte' results: {results_count}"
+            else:
+                details = f"Status: {response.status_code}"
+            return self.log_test("Search in Notes", success, details)
+        except Exception as e:
+            return self.log_test("Search in Notes", False, f"Error: {str(e)}")
+
+    def test_specific_car_brands(self):
+        """Test specific car brands mentioned in requirements"""
+        try:
+            response = requests.get(f"{self.base_url}/config", headers=self.headers, timeout=10)
+            success = response.status_code == 200
+            if success:
+                data = response.json()
+                car_brands = data.get('car_brands', {})
+                
+                # Test specific brands and models mentioned in requirements
+                test_cases = [
+                    ("BMW", "Série 3"),
+                    ("Mercedes", "Classe C"),
+                    ("Audi", "A4"),
+                    ("Porsche", "911"),
+                    ("Ferrari", "488"),
+                    ("Peugeot", "308"),
+                    ("Renault", "Clio"),
+                    ("Citroën", "C4")
+                ]
+                
+                results = []
+                for brand, model in test_cases:
+                    brand_exists = brand in car_brands
+                    model_exists = model in car_brands.get(brand, []) if brand_exists else False
+                    results.append((brand, model, brand_exists and model_exists))
+                
+                success_count = sum(1 for _, _, ok in results if ok)
+                total_tests = len(test_cases)
+                
+                details = f"Status: {response.status_code}, Brand/Model tests: {success_count}/{total_tests} passed"
+                success = success_count == total_tests
+            else:
+                details = f"Status: {response.status_code}"
+            return self.log_test("Specific Car Brands", success, details)
+        except Exception as e:
+            return self.log_test("Specific Car Brands", False, f"Error: {str(e)}")
 
     def test_get_leads(self):
         """Test getting all leads"""
