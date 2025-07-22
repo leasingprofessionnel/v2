@@ -992,6 +992,7 @@ const LeadsView = ({ leads, config, onRefresh }) => {
 
 const Calendar = ({ leads }) => {
   const [upcomingReminders, setUpcomingReminders] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchReminders = async () => {
     try {
@@ -999,6 +1000,32 @@ const Calendar = ({ leads }) => {
       setUpcomingReminders(response.data);
     } catch (error) {
       console.error('Error fetching reminders:', error);
+    }
+  };
+
+  const handleDeleteReminder = async (reminderId) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce rappel ?')) {
+      try {
+        setLoading(true);
+        await axios.delete(`${API}/reminders/${reminderId}`);
+        fetchReminders(); // Recharger la liste
+        alert('Rappel supprimé avec succès !');
+      } catch (error) {
+        console.error('Error deleting reminder:', error);
+        alert('Erreur lors de la suppression du rappel');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleToggleCompleted = async (reminderId, completed) => {
+    try {
+      await axios.put(`${API}/reminders/${reminderId}`, { completed: !completed });
+      fetchReminders(); // Recharger la liste
+    } catch (error) {
+      console.error('Error updating reminder:', error);
+      alert('Erreur lors de la mise à jour du rappel');
     }
   };
 
@@ -1013,17 +1040,58 @@ const Calendar = ({ leads }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h3 className="text-xl font-semibold mb-4 text-gray-900">📅 Rappels programmés</h3>
+          {loading && (
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            </div>
+          )}
           <div className="space-y-4">
             {upcomingReminders.length > 0 ? (
               upcomingReminders.map((reminder) => (
-                <div key={reminder.id} className="flex items-center space-x-4 p-4 bg-orange-50 rounded-lg">
-                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                <div key={reminder.id} className={`flex items-center space-x-4 p-4 rounded-lg ${
+                  reminder.completed ? 'bg-green-50 border-green-200' : 'bg-orange-50 border-orange-200'
+                } border`}>
+                  <div className={`w-3 h-3 rounded-full ${
+                    reminder.completed ? 'bg-green-500' : 'bg-orange-500'
+                  }`}></div>
                   <div className="flex-1">
-                    <p className="font-medium text-gray-900">{reminder.title}</p>
-                    <p className="text-sm text-gray-600">{reminder.description}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className={`font-medium ${
+                      reminder.completed ? 'text-green-900 line-through' : 'text-gray-900'
+                    }`}>
+                      {reminder.title}
+                    </p>
+                    {reminder.description && (
+                      <p className={`text-sm ${
+                        reminder.completed ? 'text-green-600' : 'text-gray-600'
+                      }`}>
+                        {reminder.description}
+                      </p>
+                    )}
+                    <p className={`text-xs ${
+                      reminder.completed ? 'text-green-500' : 'text-gray-500'
+                    }`}>
                       {new Date(reminder.reminder_date).toLocaleString('fr-FR')}
                     </p>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleToggleCompleted(reminder.id, reminder.completed)}
+                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                        reminder.completed 
+                          ? 'bg-orange-600 text-white hover:bg-orange-700' 
+                          : 'bg-green-600 text-white hover:bg-green-700'
+                      }`}
+                      disabled={loading}
+                    >
+                      {reminder.completed ? '↶ Rouvrir' : '✓ Terminé'}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteReminder(reminder.id)}
+                      className="px-3 py-1 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 transition-colors"
+                      disabled={loading}
+                    >
+                      🗑️ Supprimer
+                    </button>
                   </div>
                 </div>
               ))
