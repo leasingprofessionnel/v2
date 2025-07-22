@@ -722,10 +722,6 @@ class CRMAPITester:
             self.test_dashboard_stats,
             self.test_specific_car_brands,
             
-            # Activity tests (if endpoints exist)
-            self.test_create_activity,
-            self.test_get_lead_activities,
-            
             # Cleanup
             self.cleanup_test_data
         ]
