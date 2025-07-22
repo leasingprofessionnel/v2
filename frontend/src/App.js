@@ -1005,6 +1005,7 @@ const LeadsView = ({ leads, config, onRefresh }) => {
           className="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Tous les statuts</option>
+          <option value="a_contacter">À contacter</option>
           <option value="premier_contact">Premier contact</option>
           <option value="relance">Relance</option>
           <option value="attribue">Attribué</option>
