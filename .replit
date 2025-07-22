@@ -1,0 +1,19 @@
+modules = ["nodejs-18", "python-3.11", "web"]
+
+[nix]
+channel = "stable-23_11"
+
+[deployment]
+publicDir = "frontend/build"
+deploymentTarget = "static"
+
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+[[ports]]
+localPort = 8001
+externalPort = 3001
+
+[web]
+run = "npm run start"
