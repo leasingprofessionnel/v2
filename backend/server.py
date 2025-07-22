@@ -108,6 +108,8 @@ class ReminderCreate(BaseModel):
     title: str
     description: Optional[str] = None
     reminder_date: str
+    priority: Optional[str] = "medium"  # low, medium, high, urgent
+    reminder_type: Optional[str] = "general"  # general, call, email, meeting, follow_up
 
 # Configuration complète
 CAR_BRANDS = {
