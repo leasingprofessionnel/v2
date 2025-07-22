@@ -411,6 +411,9 @@ async def create_lead(lead_data: LeadCreate):
     
     leads_db[lead_id] = lead
     
+    # 💾 SAUVEGARDE AUTOMATIQUE
+    save_leads_to_file()
+    
     return {"message": "Lead créé avec succès", "lead": lead}
 
 @app.get("/api/leads")
