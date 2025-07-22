@@ -436,6 +436,9 @@ async def update_lead(lead_id: str, update_data: dict):
         if hasattr(lead, key):
             setattr(lead, key, value)
     
+    # 💾 SAUVEGARDE AUTOMATIQUE
+    save_leads_to_file()
+    
     return {"message": "Lead mis à jour", "lead": lead}
 
 @app.delete("/api/leads/{lead_id}")
