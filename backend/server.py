@@ -446,9 +446,6 @@ async def delete_lead(lead_id: str):
     
     del leads_db[lead_id]
     
-    # 💾 SAUVEGARDE AUTOMATIQUE
-    save_leads_to_file()
-    
     return {"message": "Lead supprimé"}
 
 @app.get("/api/leads/{lead_id}/pdf")
