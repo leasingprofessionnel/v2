@@ -47,7 +47,7 @@ class CRMAPITester:
             return self.log_test("API Root", False, f"Error: {str(e)}")
 
     def test_get_config(self):
-        """Test configuration endpoint with new features"""
+        """Test configuration endpoint with all restored features"""
         try:
             response = requests.get(f"{self.base_url}/config", headers=self.headers, timeout=10)
             success = response.status_code == 200
@@ -56,30 +56,70 @@ class CRMAPITester:
                 required_keys = ['prestataires', 'commerciaux', 'car_brands', 'contract_durations', 'annual_mileages', 'status_colors']
                 has_all_keys = all(key in data for key in required_keys)
                 
-                # Test new commercials
+                # Test commerciaux (should include Matthews, Sauveur, Autre)
                 commerciaux = data.get('commerciaux', [])
                 expected_commerciaux = ["Matthews", "Sauveur", "Autre"]
                 commerciaux_ok = all(c in commerciaux for c in expected_commerciaux)
                 
-                # Test extended car brands
+                # Test prestataires (should include major leasing companies)
+                prestataires = data.get('prestataires', [])
+                expected_prestataires = ["Localease", "Leasefactory", "Ayvens", "ALD Automotive", "Arval"]
+                prestataires_ok = all(p in prestataires for p in expected_prestataires)
+                
+                # Test car brands (should have 90+ brands)
                 car_brands = data.get('car_brands', {})
                 brand_count = len(car_brands)
+                brands_90_plus = brand_count >= 90
                 
-                # Test specific premium brands
-                premium_brands = ["BMW", "Mercedes", "Audi", "Porsche", "Ferrari"]
-                premium_ok = all(brand in car_brands for brand in premium_brands)
+                # Test specific premium brands and their models
+                premium_brands_models = {
+                    "BMW": ["Série 1", "Série 3", "X1", "X3"],
+                    "Mercedes": ["Classe A", "Classe C", "GLA", "GLC"],
+                    "Audi": ["A1", "A3", "Q2", "Q3"],
+                    "Porsche": ["911", "Boxster", "Macan", "Cayenne"],
+                    "Ferrari": ["488", "F8", "SF90", "Roma"]
+                }
+                
+                premium_ok = True
+                for brand, models in premium_brands_models.items():
+                    if brand not in car_brands:
+                        premium_ok = False
+                        break
+                    brand_models = car_brands[brand]
+                    if not any(model in brand_models for model in models):
+                        premium_ok = False
+                        break
                 
                 # Test French brands
-                french_brands = ["Peugeot", "Renault", "Citroën"]
+                french_brands = ["Peugeot", "Renault", "Citroën", "DS"]
                 french_ok = all(brand in car_brands for brand in french_brands)
                 
-                success = has_all_keys and commerciaux_ok and brand_count >= 50 and premium_ok and french_ok
-                details = f"Status: {response.status_code}, Keys: {has_all_keys}, Commerciaux: {commerciaux_ok} ({commerciaux}), Brands: {brand_count}, Premium: {premium_ok}, French: {french_ok}"
+                # Test contract durations and annual mileages
+                contract_durations = data.get('contract_durations', [])
+                annual_mileages = data.get('annual_mileages', [])
+                durations_ok = len(contract_durations) >= 5 and 36 in contract_durations
+                mileages_ok = len(annual_mileages) >= 5 and 15000 in annual_mileages
+                
+                # Test status colors
+                status_colors = data.get('status_colors', {})
+                status_colors_ok = len(status_colors) >= 5
+                
+                success = (has_all_keys and commerciaux_ok and prestataires_ok and 
+                          brands_90_plus and premium_ok and french_ok and 
+                          durations_ok and mileages_ok and status_colors_ok)
+                
+                details = (f"Status: {response.status_code}, Keys: {has_all_keys}, "
+                          f"Commerciaux: {commerciaux_ok} ({len(commerciaux)}), "
+                          f"Prestataires: {prestataires_ok} ({len(prestataires)}), "
+                          f"Brands: {brand_count} (90+: {brands_90_plus}), "
+                          f"Premium: {premium_ok}, French: {french_ok}, "
+                          f"Durations: {durations_ok}, Mileages: {mileages_ok}, "
+                          f"StatusColors: {status_colors_ok}")
             else:
                 details = f"Status: {response.status_code}"
-            return self.log_test("Get Config (New Features)", success, details)
+            return self.log_test("Get Config (All Restored Features)", success, details)
         except Exception as e:
-            return self.log_test("Get Config (New Features)", False, f"Error: {str(e)}")
+            return self.log_test("Get Config (All Restored Features)", False, f"Error: {str(e)}")
 
     def test_create_lead_single_vehicle(self):
         """Test creating a lead with single vehicle and note"""
