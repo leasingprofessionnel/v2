@@ -838,6 +838,62 @@ const LeadsView = ({ leads, config, onRefresh }) => {
     return matchesSearch && matchesStatus;
   });
 
+  // Fonction de tri
+  const sortedLeads = [...filteredLeads].sort((a, b) => {
+    if (!sortBy) return 0; // Pas de tri si aucun critère sélectionné
+    
+    switch (sortBy) {
+      case 'company_name':
+        return a.company.name.localeCompare(b.company.name);
+      
+      case 'contact_name':
+        const nameA = `${a.contact.first_name} ${a.contact.last_name}`.toLowerCase();
+        const nameB = `${b.contact.first_name} ${b.contact.last_name}`.toLowerCase();
+        return nameA.localeCompare(nameB);
+      
+      case 'status':
+        return a.status.localeCompare(b.status);
+      
+      case 'commercial':
+        const commercialA = a.assigned_to_commercial || '';
+        const commercialB = b.assigned_to_commercial || '';
+        return commercialA.localeCompare(commercialB);
+      
+      case 'prestataire':
+        const prestataireA = a.assigned_to_prestataire || '';
+        const prestataireB = b.assigned_to_prestataire || '';
+        return prestataireA.localeCompare(prestataireB);
+      
+      case 'vehicle_brand':
+        const brandA = (a.vehicles && a.vehicles[0] ? a.vehicles[0].brand : '');
+        const brandB = (b.vehicles && b.vehicles[0] ? b.vehicles[0].brand : '');
+        return brandA.localeCompare(brandB);
+      
+      case 'created_at':
+        const dateA = new Date(a.created_at || '');
+        const dateB = new Date(b.created_at || '');
+        return dateB - dateA; // Plus récent en premier
+      
+      case 'created_at_asc':
+        const dateAAsc = new Date(a.created_at || '');
+        const dateBAsc = new Date(b.created_at || '');
+        return dateAAsc - dateBAsc; // Plus ancien en premier
+      
+      case 'commission_total':
+        const getTotalCommission = (lead) => {
+          return lead.vehicles?.reduce((total, vehicle) => {
+            const commission = vehicle.commission_agence || '';
+            const numbers = commission.match(/\d+/);
+            return total + (numbers ? parseInt(numbers[0]) : 0);
+          }, 0) || 0;
+        };
+        return getTotalCommission(b) - getTotalCommission(a); // Plus élevé en premier
+      
+      default:
+        return 0;
+    }
+  });
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
