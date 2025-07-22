@@ -386,11 +386,16 @@ async def get_config():
         "contract_durations": CONTRACT_DURATIONS,
         "annual_mileages": ANNUAL_MILEAGES,
         "status_colors": {
-            "premier_contact": "#94a3b8",
-            "relance": "#f59e0b",
-            "accord": "#10b981",
-            "livree": "#22c55e",
-            "perdu": "#ef4444"
+            "a_contacter": "#ef4444",  # Rouge pour "À contacter"
+            "premier_contact": "#f59e0b",  # Orange
+            "relance": "#f59e0b",  # Orange
+            "attribue": "#f59e0b",  # Orange
+            "offre": "#f59e0b",  # Orange
+            "attente_document": "#f59e0b",  # Orange
+            "etude_en_cours": "#f59e0b",  # Orange
+            "accord": "#f59e0b",  # Orange
+            "livree": "#22c55e",  # Vert pour "Livrée"
+            "perdu": "#6b7280"  # Gris pour "Perdu"
         }
     }
 
