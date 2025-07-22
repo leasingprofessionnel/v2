@@ -543,24 +543,54 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-                    <input
-                      type="text"
-                      placeholder="Commission agence"
-                      value={vehicle.commission_agence || ''}
-                      onChange={(e) => updateVehicle(index, 'commission_agence', e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                    />
-                    
-                    <select
-                      value={vehicle.payment_status || 'en_attente'}
-                      onChange={(e) => updateVehicle(index, 'payment_status', e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="en_attente">En attente</option>
-                      <option value="paye">Payé</option>
-                    </select>
-                  </div>
+                  
+                  {/* Champs Commission - Affichés seulement si statut = accord ou livree */}
+                  {(formData.status === 'accord' || formData.status === 'livree') && (
+                    <div className="mt-3">
+                      <div className="bg-amber-50 p-3 rounded-lg border-l-4 border-amber-400 mb-3">
+                        <p className="text-sm text-amber-800 font-medium">
+                          💰 Section Commission (disponible car statut: {formData.status === 'accord' ? 'Accord' : 'Livrée'})
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Commission agence
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="ex: 800€"
+                            value={vehicle.commission_agence || ''}
+                            onChange={(e) => updateVehicle(index, 'commission_agence', e.target.value)}
+                            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Statut paiement commission
+                          </label>
+                          <select
+                            value={vehicle.payment_status || 'en_attente'}
+                            onChange={(e) => updateVehicle(index, 'payment_status', e.target.value)}
+                            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="en_attente">💰 En attente</option>
+                            <option value="paye">✅ Payé</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Message informatif si statut ne permet pas les commissions */}
+                  {formData.status !== 'accord' && formData.status !== 'livree' && (
+                    <div className="mt-3 bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400">
+                      <p className="text-sm text-blue-800">
+                        ℹ️ Les champs de commission apparaîtront une fois le statut passé à <strong>"Accord"</strong> ou <strong>"Livrée"</strong>
+                      </p>
+                    </div>
+                  )}
                 </div>
               );
             })}
