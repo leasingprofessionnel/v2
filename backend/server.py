@@ -437,14 +437,24 @@ async def update_lead(lead_id: str, update_data: dict):
         raise HTTPException(status_code=404, detail="Lead introuvable")
     
     lead = leads_db[lead_id]
+    
+    # Traitement spécial pour les objets complexes
     for key, value in update_data.items():
-        if hasattr(lead, key):
+        if key == 'company' and isinstance(value, dict):
+            lead.company = Company(**value)
+        elif key == 'contact' and isinstance(value, dict):
+            lead.contact = Contact(**value)
+        elif key == 'vehicles' and isinstance(value, list):
+            lead.vehicles = [Vehicle(**v) for v in value]
+        elif key == 'reminders' and isinstance(value, list):
+            lead.reminders = [Reminder(**r) for r in value]
+        elif hasattr(lead, key):
             setattr(lead, key, value)
     
     # 💾 SAUVEGARDE AUTOMATIQUE
     save_leads_to_file()
     
-    return {"message": "Lead mis à jour", "lead": lead}
+    return {"message": "Lead mis à jour avec succès", "lead": lead}
 
 @app.delete("/api/leads/{lead_id}")
 async def delete_lead(lead_id: str):
