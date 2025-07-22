@@ -101,3 +101,149 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Restaurer toutes les fonctionnalités manquantes dans le CRM LEASINPROFESSIONNEL.FR : bouton PDF, rappels, liste complète des marques et modèles de voitures, liste des prestataires et commerciaux"
+
+backend:
+  - task: "PDF Export Functionality"
+    implemented: true
+    working: "needs_testing"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "PDF export function generate_lead_pdf and endpoint /api/leads/{lead_id}/pdf already implemented with ReportLab, needs testing"
+
+  - task: "Reminder System Backend"
+    implemented: true
+    working: "needs_testing"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "Reminder models and endpoints implemented: POST /api/reminders, GET /api/reminders, GET /api/calendar/reminders with date filtering"
+
+  - task: "Car Brands and Models Configuration"
+    implemented: true
+    working: "needs_testing"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "90+ car brands with models in CAR_BRANDS dict (Abarth to Wiesmann), exposed via /api/config endpoint"
+
+  - task: "Commercial and Prestataire Lists"
+    implemented: true
+    working: "needs_testing"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "COMMERCIAUX list (Matthews, Sauveur, Autre) and PRESTATAIRES list (Localease, Leasefactory, Ayvens, ALD Automotive, Arval, etc.) implemented and exposed via /api/config"
+
+  - task: "Configuration API Endpoint"
+    implemented: true
+    working: "needs_testing"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "Enhanced /api/config endpoint now returns car_brands, commerciaux, prestataires, contract_durations, annual_mileages, and status_colors"
+
+frontend:
+  - task: "PDF Download Button"
+    implemented: true
+    working: "needs_testing"
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "PDF download button and handleDownloadPDF function already implemented in LeadForm component (lines 322-326, 277-309)"
+
+  - task: "Reminder Form and Button"
+    implemented: true
+    working: "needs_testing"
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "Add Reminder button and ReminderForm component already implemented (lines 329-333, 111-178)"
+
+  - task: "Car Brands and Models Integration"
+    implemented: true
+    working: "needs_testing"
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "Frontend uses config.car_brands from backend config API, dynamic brand/model selection implemented in vehicle form"
+
+  - task: "Commercial and Prestataire Dropdowns"
+    implemented: true
+    working: "needs_testing"
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "Frontend uses config.commerciaux and config.prestataires from backend config, dropdowns implemented in attribution section"
+
+  - task: "Calendar Reminders View"
+    implemented: true
+    working: "needs_testing"
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "Calendar component with reminders view implemented, fetches from /api/calendar/reminders endpoint"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "PDF Export Functionality"
+    - "Reminder System Backend"
+    - "Car Brands and Models Configuration"
+    - "Commercial and Prestataire Lists"
+    - "PDF Download Button"
+    - "Reminder Form and Button"
+  stuck_tasks: []
+  test_all: true
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "All missing CRM features have been restored. Backend contains all necessary endpoints, PDF generation, reminder system, 90+ car brands/models, commercial/prestataire lists. Frontend has PDF button, reminder button, dynamic dropdowns. Ready for comprehensive testing to verify all functionalities work correctly."
