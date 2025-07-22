@@ -404,7 +404,8 @@ def generate_lead_pdf(lead: Lead) -> str:
                 ['Durée contrat', f"{vehicle.contract_duration} mois"],
                 ['Kilométrage annuel', f"{vehicle.annual_mileage:,} km/an".replace(',', ' ')],
                 ['Tarif mensuel', vehicle.tarif_mensuel or 'Non renseigné'],
-                ['Commission agence', vehicle.commission_agence or 'Non renseigné']
+                ['Commission agence', vehicle.commission_agence or 'Non renseigné'],
+                ['Statut paiement', 'Payé' if vehicle.payment_status == 'paye' else 'En attente']
             ]
             
             vehicle_table = Table(vehicle_data, colWidths=[2.5*inch, 4*inch])
