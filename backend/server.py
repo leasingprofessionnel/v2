@@ -514,10 +514,6 @@ async def create_reminder(reminder_data: ReminderCreate):
     if reminder_data.lead_id in leads_db:
         leads_db[reminder_data.lead_id].reminders.append(reminder)
     
-    # 💾 SAUVEGARDE AUTOMATIQUE
-    save_reminders_to_file()
-    save_leads_to_file()  # Car on a modifié le lead aussi
-    
     return {"message": "Rappel créé avec succès", "reminder": reminder}
 
 @app.get("/api/dashboard/stats")
