@@ -114,7 +114,9 @@ const ReminderForm = ({ leadId, onSave, onCancel }) => {
   const [reminderData, setReminderData] = useState({
     title: '',
     description: '',
-    reminder_date: new Date().toISOString().slice(0, 16) // Default to now
+    reminder_date: new Date().toISOString().slice(0, 16), // Default to now
+    priority: 'medium',
+    reminder_type: 'general'
   });
 
   const handleSubmit = (e) => {
@@ -128,7 +130,7 @@ const ReminderForm = ({ leadId, onSave, onCancel }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+      <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full mx-4">
         <h3 className="text-lg font-bold mb-4">📅 Ajouter un rappel</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -139,6 +141,38 @@ const ReminderForm = ({ leadId, onSave, onCancel }) => {
             className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
             required
           />
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Priorité</label>
+              <select
+                value={reminderData.priority}
+                onChange={(e) => setReminderData({ ...reminderData, priority: e.target.value })}
+                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="low">📝 Faible</option>
+                <option value="medium">📋 Normal</option>
+                <option value="high">⚡ Prioritaire</option>
+                <option value="urgent">🚨 Urgent</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+              <select
+                value={reminderData.reminder_type}
+                onChange={(e) => setReminderData({ ...reminderData, reminder_type: e.target.value })}
+                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="general">📝 Général</option>
+                <option value="call">📞 Appel</option>
+                <option value="email">✉️ Email</option>
+                <option value="meeting">🤝 Rendez-vous</option>
+                <option value="follow_up">📋 Suivi</option>
+              </select>
+            </div>
+          </div>
+          
           <textarea
             placeholder="Description (optionnel)"
             value={reminderData.description}
