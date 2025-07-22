@@ -456,6 +456,11 @@ async def create_lead(lead_data: LeadCreate):
     
     return {"message": "Lead créé avec succès", "lead": lead}
 
+@app.get("/api/leads")
+async def get_leads():
+    """Récupérer tous les leads (pour compatibilité)"""
+    return list(leads_db.values())
+
 @app.get("/api/clients")
 async def get_clients():
     """Récupérer tous les leads avec statut 'livree' (clients)"""
