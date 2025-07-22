@@ -360,12 +360,19 @@ async def download_lead_pdf(lead_id: str):
     
     lead = leads_db[lead_id]
     pdf_path = generate_lead_pdf(lead)
-    filename = f"Lead_{lead.company.name.replace(' ', '_')}_{lead_id}.pdf"
+    
+    # S'assurer que le nom de fichier a l'extension .pdf
+    safe_company_name = lead.company.name.replace(' ', '_').replace('/', '_').replace('\\', '_')
+    filename = f"Lead_{safe_company_name}_{lead_id}.pdf"
     
     return FileResponse(
         path=pdf_path,
         filename=filename,
-        media_type='application/pdf'
+        media_type='application/pdf',
+        headers={
+            "Content-Disposition": f"attachment; filename={filename}",
+            "Content-Type": "application/pdf"
+        }
     )
 
 @app.get("/api/reminders")
