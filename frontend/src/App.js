@@ -1694,7 +1694,7 @@ function App() {
     try {
       setLoading(true);
       const [leadsRes, statsRes, configRes] = await Promise.all([
-        axios.get(`${API}/leads`),
+        axios.get(`${API}/leads/active`), // Seuls les leads actifs (non livrés)
         axios.get(`${API}/dashboard/stats`),
         axios.get(`${API}/config`)
       ]);
