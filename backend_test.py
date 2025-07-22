@@ -275,11 +275,12 @@ class CRMAPITester:
 
     def test_get_single_lead(self):
         """Test getting a single lead by ID"""
-        if not self.created_lead_id:
+        if not self.created_lead_ids:
             return self.log_test("Get Single Lead", False, "No lead ID available")
         
+        lead_id = self.created_lead_ids[0]
         try:
-            response = requests.get(f"{self.base_url}/leads/{self.created_lead_id}", 
+            response = requests.get(f"{self.base_url}/leads/{lead_id}", 
                                   headers=self.headers, timeout=10)
             success = response.status_code == 200
             if success:
@@ -293,13 +294,14 @@ class CRMAPITester:
 
     def test_update_lead_status(self):
         """Test updating lead status"""
-        if not self.created_lead_id:
+        if not self.created_lead_ids:
             return self.log_test("Update Lead Status", False, "No lead ID available")
         
-        update_data = {"status": "relance"}
+        lead_id = self.created_lead_ids[0]
+        update_data = {"status": "offre"}
         
         try:
-            response = requests.put(f"{self.base_url}/leads/{self.created_lead_id}", 
+            response = requests.put(f"{self.base_url}/leads/{lead_id}", 
                                   json=update_data, 
                                   headers=self.headers, 
                                   timeout=10)
@@ -313,6 +315,33 @@ class CRMAPITester:
             return self.log_test("Update Lead Status", success, details)
         except Exception as e:
             return self.log_test("Update Lead Status", False, f"Error: {str(e)}")
+
+    def test_update_lead_note(self):
+        """Test updating lead note"""
+        if not self.created_lead_ids:
+            return self.log_test("Update Lead Note", False, "No lead ID available")
+        
+        lead_id = self.created_lead_ids[0]
+        update_data = {
+            "note": "Note mise à jour: Offre envoyée le " + datetime.now().strftime("%d/%m/%Y") + ". En attente de retour client."
+        }
+        
+        try:
+            response = requests.put(f"{self.base_url}/leads/{lead_id}", 
+                                  json=update_data, 
+                                  headers=self.headers, 
+                                  timeout=10)
+            success = response.status_code == 200
+            if success:
+                data = response.json()
+                updated_note = data.get('note', '')
+                note_updated = 'mise à jour' in updated_note
+                details = f"Status: {response.status_code}, Note updated: {note_updated}"
+            else:
+                details = f"Status: {response.status_code}"
+            return self.log_test("Update Lead Note", success, details)
+        except Exception as e:
+            return self.log_test("Update Lead Note", False, f"Error: {str(e)}")
 
     def test_search_leads(self):
         """Test lead search functionality"""
