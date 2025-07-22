@@ -180,6 +180,8 @@ class LeadUpdate(BaseModel):
     contact: Optional[ContactCreate] = None
     vehicles: Optional[List[VehicleCreate]] = None  # Support multiple vehicles
     note: Optional[str] = None  # Champ note
+    delivery_date: Optional[date] = None  # Date de livraison
+    contract_end_date: Optional[date] = None  # Date de fin de contrat
 
 # Status colors mapping
 STATUS_COLORS = {
