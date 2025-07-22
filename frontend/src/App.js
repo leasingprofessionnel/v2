@@ -443,6 +443,7 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
               onChange={(e) => setFormData({ ...formData, status: e.target.value })}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
             >
+              <option value="a_contacter">🔴 À contacter</option>
               <option value="premier_contact">Premier contact</option>
               <option value="relance">Relance</option>
               <option value="attribue">Attribué</option>
@@ -450,7 +451,7 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
               <option value="attente_document">Attente document</option>
               <option value="etude_en_cours">Étude en cours</option>
               <option value="accord">Accord</option>
-              <option value="livree">Livrée</option>
+              <option value="livree">🟢 Livrée</option>
               <option value="perdu">Perdu</option>
             </select>
           </div>
