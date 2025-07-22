@@ -16,6 +16,14 @@ from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 
+# Chemin des fichiers de sauvegarde
+BACKUP_DIR = "/app/backup"
+LEADS_BACKUP_FILE = f"{BACKUP_DIR}/leads_backup.json"
+REMINDERS_BACKUP_FILE = f"{BACKUP_DIR}/reminders_backup.json"
+
+# Créer le répertoire de sauvegarde s'il n'existe pas
+os.makedirs(BACKUP_DIR, exist_ok=True)
+
 # Application FastAPI
 app = FastAPI(
     title="CRM LEASINPROFESSIONNEL.FR",
