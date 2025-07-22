@@ -632,10 +632,10 @@
         "payment_status": "en_attente"
       }
     ],
-    "status": "a_contacter",
+    "status": "livree",
     "note": "Test du calcul automatique des dates",
-    "delivery_date": null,
-    "contract_end_date": null,
+    "delivery_date": "2025-01-15",
+    "contract_end_date": "2028-01-15",
     "assigned_to_commercial": null,
     "assigned_to_prestataire": null,
     "reminders": [],
