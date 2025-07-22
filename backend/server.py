@@ -403,6 +403,43 @@ async def update_reminder(reminder_id: str, completed: bool):
         raise HTTPException(status_code=404, detail="Reminder not found")
     return Reminder(**updated_reminder)
 
+@api_router.get("/calendar/reminders")
+async def get_upcoming_reminders(days: int = Query(7, ge=1, le=30)):
+    end_date = datetime.utcnow() + timedelta(days=days)
+    reminders = await db.reminders.find({
+        "reminder_date": {"$lte": end_date},
+        "completed": False
+    }).sort("reminder_date", 1).to_list(1000)
+    return [Reminder(**reminder) for reminder in reminders]
+
+@api_router.get("/leads/{lead_id}/pdf")
+async def download_lead_pdf(lead_id: str):
+    """Generate and download PDF for a lead"""
+    # Get the lead
+    lead_data = await db.leads.find_one({"id": lead_id})
+    if not lead_data:
+        raise HTTPException(status_code=404, detail="Lead not found")
+    
+    lead = Lead(**lead_data)
+    
+    # Generate PDF
+    try:
+        pdf_path = generate_lead_pdf(lead)
+        
+        # Return file response
+        filename = f"Lead_{lead.company.name.replace(' ', '_')}_{lead_id[:8]}.pdf"
+        
+        return FileResponse(
+            path=pdf_path,
+            filename=filename,
+            media_type='application/pdf',
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
+    except Exception as e:
+        logger.error(f"Error generating PDF for lead {lead_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error generating PDF")
+
 # PDF Generation
 def generate_lead_pdf(lead: Lead) -> str:
     """Generate a PDF for a lead and return the file path"""
