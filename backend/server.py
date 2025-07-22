@@ -568,6 +568,8 @@ async def create_reminder(reminder_data: ReminderCreate):
         title=reminder_data.title,
         description=reminder_data.description,
         reminder_date=reminder_data.reminder_date,
+        priority=reminder_data.priority or "medium",
+        reminder_type=reminder_data.reminder_type or "general",
         created_at=datetime.now().isoformat()
     )
     
