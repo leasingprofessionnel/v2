@@ -522,11 +522,13 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
                         onChange={(e) => updateVehicle(index, 'carburant', e.target.value)}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                       >
-                      <option value="diesel">Diesel</option>
-                      <option value="essence">Essence</option>
-                      <option value="hybride">Hybride</option>
-                      <option value="electrique">Électrique</option>
-                    </select>
+                        <option value="">À définir</option>
+                        <option value="diesel">Diesel</option>
+                        <option value="essence">Essence</option>
+                        <option value="hybride">Hybride</option>
+                        <option value="electrique">Électrique</option>
+                      </select>
+                    </div>
 
                     <select
                       value={vehicle.contract_duration}
