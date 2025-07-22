@@ -359,10 +359,26 @@ class CRMAPITester:
         except Exception as e:
             return self.log_test("Search Leads", False, f"Error: {str(e)}")
 
+    def test_filter_leads_by_commercial(self):
+        """Test lead filtering by commercial (new feature)"""
+        try:
+            response = requests.get(f"{self.base_url}/leads?commercial=Matthews", 
+                                  headers=self.headers, timeout=10)
+            success = response.status_code == 200
+            if success:
+                data = response.json()
+                results_count = len(data) if isinstance(data, list) else 0
+                details = f"Status: {response.status_code}, Matthews leads: {results_count}"
+            else:
+                details = f"Status: {response.status_code}"
+            return self.log_test("Filter Leads by Commercial", success, details)
+        except Exception as e:
+            return self.log_test("Filter Leads by Commercial", False, f"Error: {str(e)}")
+
     def test_filter_leads_by_status(self):
         """Test lead filtering by status"""
         try:
-            response = requests.get(f"{self.base_url}/leads?status=relance", 
+            response = requests.get(f"{self.base_url}/leads?status=offre", 
                                   headers=self.headers, timeout=10)
             success = response.status_code == 200
             if success:
