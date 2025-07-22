@@ -445,6 +445,29 @@ def generate_lead_pdf(lead: Lead) -> str:
     story.append(attribution_table)
     story.append(Spacer(1, 15))
     
+    # Dates importantes Section
+    if lead.delivery_date or lead.contract_end_date:
+        story.append(Paragraph("📅 DATES IMPORTANTES", heading_style))
+        dates_data = []
+        if lead.delivery_date:
+            dates_data.append(['Date de livraison', lead.delivery_date.strftime('%d/%m/%Y')])
+        if lead.contract_end_date:
+            dates_data.append(['Fin de contrat', lead.contract_end_date.strftime('%d/%m/%Y')])
+        
+        if dates_data:
+            dates_table = Table(dates_data, colWidths=[2.5*inch, 4*inch])
+            dates_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#fef3c7')),
+                ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+                ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#d1d5db'))
+            ]))
+            story.append(dates_table)
+            story.append(Spacer(1, 15))
+    
     # Notes Section
     if lead.note:
         story.append(Paragraph("📝 NOTES", heading_style))
