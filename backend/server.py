@@ -465,6 +465,14 @@ async def update_lead(lead_id: str, update_data: dict):
         elif hasattr(lead, key):
             setattr(lead, key, value)
     
+    # 📅 CALCUL AUTOMATIQUE DE LA DATE DE FIN DE CONTRAT
+    if lead.delivery_date and lead.vehicles:
+        # Utiliser la durée du premier véhicule pour calculer la fin de contrat
+        contract_duration = lead.vehicles[0].contract_duration
+        if contract_duration:
+            lead.contract_end_date = calculate_contract_end_date(lead.delivery_date, contract_duration)
+            print(f"📅 Date fin contrat calculée: {lead.contract_end_date} (livraison: {lead.delivery_date} + {contract_duration} mois)")
+    
     # 💾 SAUVEGARDE AUTOMATIQUE
     save_leads_to_file()
     
