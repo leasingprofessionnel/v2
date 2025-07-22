@@ -364,6 +364,31 @@ async def download_lead_pdf(lead_id: str):
         media_type='application/pdf'
     )
 
+@app.get("/api/reminders")
+async def get_reminders():
+    return list(reminders_db.values())
+
+@app.get("/api/calendar/reminders")
+async def get_calendar_reminders(days: int = 30):
+    """Get upcoming reminders for the next N days"""
+    from datetime import datetime, timedelta
+    
+    now = datetime.now()
+    future_date = now + timedelta(days=days)
+    
+    upcoming = []
+    for reminder in reminders_db.values():
+        try:
+            reminder_date = datetime.fromisoformat(reminder.reminder_date.replace('Z', '+00:00'))
+            if now <= reminder_date <= future_date and not reminder.completed:
+                upcoming.append(reminder)
+        except:
+            pass  # Skip invalid dates
+    
+    # Sort by date
+    upcoming.sort(key=lambda x: x.reminder_date)
+    return upcoming
+
 @app.post("/api/reminders")
 async def create_reminder(reminder_data: ReminderCreate):
     reminder_id = str(uuid.uuid4())[:8]
