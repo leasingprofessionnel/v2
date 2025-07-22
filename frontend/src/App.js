@@ -478,36 +478,50 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
                 <div key={index} className="border-2 border-red-200 p-4 rounded-lg mb-4 bg-white">
                   <h5 className="font-medium text-red-800 mb-3">Véhicule {index + 1}</h5>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <select
-                      value={vehicle.brand}
-                      onChange={(e) => updateVehicle(index, 'brand', e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                      required
-                    >
-                      <option value="">Sélectionner une marque</option>
-                      {Object.keys(config.car_brands || {}).map(brand => (
-                        <option key={brand} value={brand}>{brand}</option>
-                      ))}
-                    </select>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Marque véhicule <span className="text-gray-400">(optionnel)</span>
+                      </label>
+                      <select
+                        value={vehicle.brand}
+                        onChange={(e) => updateVehicle(index, 'brand', e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">🚗 Pas encore défini</option>
+                        {Object.keys(config.car_brands || {}).map(brand => (
+                          <option key={brand} value={brand}>{brand}</option>
+                        ))}
+                      </select>
+                    </div>
                     
-                    <select
-                      value={vehicle.model}
-                      onChange={(e) => updateVehicle(index, 'model', e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                      required
-                      disabled={!vehicle.brand}
-                    >
-                      <option value="">Sélectionner un modèle</option>
-                      {selectedBrandModels.map(model => (
-                        <option key={model} value={model}>{model}</option>
-                      ))}
-                    </select>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Modèle véhicule <span className="text-gray-400">(optionnel)</span>
+                      </label>
+                      <select
+                        value={vehicle.model}
+                        onChange={(e) => updateVehicle(index, 'model', e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                        disabled={!vehicle.brand}
+                      >
+                        <option value="">
+                          {vehicle.brand ? "Sélectionner un modèle" : "Choisir d'abord une marque"}
+                        </option>
+                        {selectedBrandModels.map(model => (
+                          <option key={model} value={model}>{model}</option>
+                        ))}
+                      </select>
+                    </div>
 
-                    <select
-                      value={vehicle.carburant}
-                      onChange={(e) => updateVehicle(index, 'carburant', e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                    >
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Carburant <span className="text-gray-400">(optionnel)</span>
+                      </label>
+                      <select
+                        value={vehicle.carburant}
+                        onChange={(e) => updateVehicle(index, 'carburant', e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      >
                       <option value="diesel">Diesel</option>
                       <option value="essence">Essence</option>
                       <option value="hybride">Hybride</option>
