@@ -456,9 +456,17 @@ async def create_lead(lead_data: LeadCreate):
     
     return {"message": "Lead créé avec succès", "lead": lead}
 
-@app.get("/api/leads")
-async def get_leads():
-    return list(leads_db.values())
+@app.get("/api/clients")
+async def get_clients():
+    """Récupérer tous les leads avec statut 'livree' (clients)"""
+    clients = [lead for lead in leads_db.values() if lead.status == "livree"]
+    return clients
+
+@app.get("/api/leads/active")
+async def get_active_leads():
+    """Récupérer tous les leads SAUF ceux avec statut 'livree'"""
+    active_leads = [lead for lead in leads_db.values() if lead.status != "livree"]
+    return active_leads
 
 @app.get("/api/leads/{lead_id}")
 async def get_lead(lead_id: str):
