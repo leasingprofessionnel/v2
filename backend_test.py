@@ -23,6 +23,7 @@ class CRMAPITester:
         self.tests_run = 0
         self.tests_passed = 0
         self.created_lead_ids = []
+        self.created_reminder_ids = []
 
     def log_test(self, name: str, success: bool, details: str = ""):
         """Log test results"""
