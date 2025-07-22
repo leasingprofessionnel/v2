@@ -285,8 +285,9 @@ async def get_leads(
             {"company.name": {"$regex": search, "$options": "i"}},
             {"contact.first_name": {"$regex": search, "$options": "i"}},
             {"contact.last_name": {"$regex": search, "$options": "i"}},
-            {"vehicle.brand": {"$regex": search, "$options": "i"}},
-            {"vehicle.model": {"$regex": search, "$options": "i"}}
+            {"vehicles.brand": {"$regex": search, "$options": "i"}},
+            {"vehicles.model": {"$regex": search, "$options": "i"}},
+            {"note": {"$regex": search, "$options": "i"}}
         ]
     
     leads = await db.leads.find(query).skip(skip).limit(limit).to_list(limit)
