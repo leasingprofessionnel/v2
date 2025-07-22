@@ -403,14 +403,196 @@ async def update_reminder(reminder_id: str, completed: bool):
         raise HTTPException(status_code=404, detail="Reminder not found")
     return Reminder(**updated_reminder)
 
-@api_router.get("/calendar/reminders")
-async def get_upcoming_reminders(days: int = Query(7, ge=1, le=30)):
-    end_date = datetime.utcnow() + timedelta(days=days)
-    reminders = await db.reminders.find({
-        "reminder_date": {"$lte": end_date},
-        "completed": False
-    }).sort("reminder_date", 1).to_list(1000)
-    return [Reminder(**reminder) for reminder in reminders]
+# PDF Generation
+def generate_lead_pdf(lead: Lead) -> str:
+    """Generate a PDF for a lead and return the file path"""
+    # Create temporary file
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+    temp_path = temp_file.name
+    temp_file.close()
+    
+    # Create PDF document
+    doc = SimpleDocTemplate(temp_path, pagesize=A4)
+    story = []
+    styles = getSampleStyleSheet()
+    
+    # Custom styles
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        spaceAfter=30,
+        alignment=TA_CENTER,
+        textColor=colors.HexColor('#2563eb')
+    )
+    
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontSize=16,
+        spaceAfter=12,
+        spaceBefore=20,
+        textColor=colors.HexColor('#1f2937')
+    )
+    
+    normal_style = ParagraphStyle(
+        'CustomNormal',
+        parent=styles['Normal'],
+        fontSize=10,
+        spaceAfter=6,
+        leftIndent=20
+    )
+    
+    # Title
+    story.append(Paragraph("🚗 CRM LLD Automobile - Fiche Lead", title_style))
+    story.append(Spacer(1, 20))
+    
+    # Lead Info Header
+    lead_info = f"""
+    <para align="center">
+    <b>Lead ID:</b> {lead.id}<br/>
+    <b>Créé le:</b> {lead.created_at.strftime('%d/%m/%Y à %H:%M')}<br/>
+    <b>Dernière mise à jour:</b> {lead.updated_at.strftime('%d/%m/%Y à %H:%M')}<br/>
+    <b>Statut:</b> <b>{lead.status.replace('_', ' ').title()}</b>
+    </para>
+    """
+    story.append(Paragraph(lead_info, styles['Normal']))
+    story.append(Spacer(1, 20))
+    
+    # Company Section
+    story.append(Paragraph("🏢 INFORMATIONS SOCIÉTÉ", heading_style))
+    company_data = [
+        ['Nom de la société', lead.company.name],
+        ['SIRET', lead.company.siret or 'Non renseigné'],
+        ['Email', lead.company.email or 'Non renseigné'],
+        ['Téléphone', lead.company.phone or 'Non renseigné'],
+        ['Adresse', lead.company.address or 'Non renseigné']
+    ]
+    
+    company_table = Table(company_data, colWidths=[2.5*inch, 4*inch])
+    company_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#eff6ff')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#d1d5db'))
+    ]))
+    story.append(company_table)
+    story.append(Spacer(1, 15))
+    
+    # Contact Section
+    story.append(Paragraph("👤 CONTACT PRINCIPAL", heading_style))
+    contact_data = [
+        ['Prénom', lead.contact.first_name],
+        ['Nom', lead.contact.last_name],
+        ['Email', lead.contact.email],
+        ['Téléphone', lead.contact.phone or 'Non renseigné'],
+        ['Poste', lead.contact.position or 'Non renseigné']
+    ]
+    
+    contact_table = Table(contact_data, colWidths=[2.5*inch, 4*inch])
+    contact_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f0fdf4')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#d1d5db'))
+    ]))
+    story.append(contact_table)
+    story.append(Spacer(1, 15))
+    
+    # Vehicles Section
+    story.append(Paragraph("🚗 VÉHICULES", heading_style))
+    if lead.vehicles:
+        for i, vehicle in enumerate(lead.vehicles):
+            vehicle_title = f"Véhicule {i + 1}"
+            story.append(Paragraph(vehicle_title, ParagraphStyle('VehicleTitle', parent=styles['Heading3'], fontSize=12, spaceAfter=8)))
+            
+            vehicle_data = [
+                ['Marque', vehicle.brand],
+                ['Modèle', vehicle.model],
+                ['Carburant', vehicle.carburant.title()],
+                ['Durée contrat', f"{vehicle.contract_duration} mois"],
+                ['Kilométrage annuel', f"{vehicle.annual_mileage:,} km/an".replace(',', ' ')],
+                ['Tarif mensuel', vehicle.tarif_mensuel or 'Non renseigné'],
+                ['Commission agence', vehicle.commission_agence or 'Non renseigné']
+            ]
+            
+            vehicle_table = Table(vehicle_data, colWidths=[2.5*inch, 4*inch])
+            vehicle_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#fef2f2')),
+                ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+                ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#d1d5db'))
+            ]))
+            story.append(vehicle_table)
+            story.append(Spacer(1, 10))
+    else:
+        story.append(Paragraph("Aucun véhicule renseigné", normal_style))
+    
+    story.append(Spacer(1, 15))
+    
+    # Attribution Section
+    story.append(Paragraph("🎯 ATTRIBUTION", heading_style))
+    attribution_data = [
+        ['Commercial assigné', lead.assigned_to_commercial or 'Non assigné'],
+        ['Prestataire', lead.assigned_to_prestataire or 'Non assigné']
+    ]
+    
+    attribution_table = Table(attribution_data, colWidths=[2.5*inch, 4*inch])
+    attribution_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f3e8ff')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#d1d5db'))
+    ]))
+    story.append(attribution_table)
+    story.append(Spacer(1, 15))
+    
+    # Notes Section
+    if lead.note:
+        story.append(Paragraph("📝 NOTES", heading_style))
+        note_para = Paragraph(lead.note.replace('\n', '<br/>'), normal_style)
+        story.append(note_para)
+        story.append(Spacer(1, 15))
+    
+    # Reminders Section
+    if lead.reminders:
+        story.append(Paragraph("📅 RAPPELS PROGRAMMÉS", heading_style))
+        for reminder in lead.reminders:
+            reminder_text = f"""
+            <b>{reminder.title}</b><br/>
+            Date: {reminder.reminder_date.strftime('%d/%m/%Y à %H:%M')}<br/>
+            {reminder.description if reminder.description else ''}
+            """
+            story.append(Paragraph(reminder_text, normal_style))
+            story.append(Spacer(1, 8))
+    
+    # Footer
+    story.append(Spacer(1, 30))
+    footer_text = f"""
+    <para align="center">
+    <font size="8">
+    Document généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')} par le CRM LLD Automobile<br/>
+    © 2025 - Tous droits réservés
+    </font>
+    </para>
+    """
+    story.append(Paragraph(footer_text, styles['Normal']))
+    
+    # Build PDF
+    doc.build(story)
+    return temp_path
 
 # Dashboard stats
 @api_router.get("/dashboard/stats")
