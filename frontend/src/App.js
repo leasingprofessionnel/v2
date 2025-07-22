@@ -713,6 +713,15 @@ const LeadsTable = ({ leads, onEdit, onDelete, onStatusChange, statusColors, con
                         {lead.vehicles[0].tarif_mensuel && (
                           <span className="ml-2 text-green-600">{lead.vehicles[0].tarif_mensuel}</span>
                         )}
+                        {lead.vehicles[0].commission_agence && (
+                          <span className={`ml-2 text-xs px-2 py-1 rounded ${
+                            lead.vehicles[0].payment_status === 'paye' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-orange-100 text-orange-800'
+                          }`}>
+                            {lead.vehicles[0].payment_status === 'paye' ? '✓ Payé' : '⏳ Attente'}
+                          </span>
+                        )}
                       </div>
                       {lead.vehicles.length > 1 && (
                         <div className="text-xs text-blue-600">
