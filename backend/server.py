@@ -566,6 +566,122 @@ async def get_stats():
         }
     }
 
+# 💾 ENDPOINTS DE SAUVEGARDE/RESTAURATION MANUELS
+
+@app.get("/api/backup/export")
+async def export_backup():
+    """Export complet de toutes les données (leads + rappels)"""
+    try:
+        # Forcer une sauvegarde fraîche
+        save_leads_to_file()
+        save_reminders_to_file()
+        
+        export_data = {
+            "export_date": datetime.now().isoformat(),
+            "version": "1.0",
+            "leads": {},
+            "reminders": {}
+        }
+        
+        # Exporter les leads
+        for lead_id, lead in leads_db.items():
+            export_data["leads"][lead_id] = lead.dict() if hasattr(lead, 'dict') else lead.__dict__
+        
+        # Exporter les rappels
+        for reminder_id, reminder in reminders_db.items():
+            export_data["reminders"][reminder_id] = reminder.dict() if hasattr(reminder, 'dict') else reminder.__dict__
+        
+        return {
+            "message": f"Export réussi - {len(export_data['leads'])} leads, {len(export_data['reminders'])} rappels",
+            "data": export_data
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur export: {str(e)}")
+
+@app.post("/api/backup/import")
+async def import_backup(backup_data: dict):
+    """Import complet de données sauvegardées"""
+    try:
+        global leads_db, reminders_db
+        
+        # Sauvegarder l'état actuel au cas où
+        backup_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        os.rename(LEADS_BACKUP_FILE, f"{LEADS_BACKUP_FILE}.backup_{backup_timestamp}")
+        os.rename(REMINDERS_BACKUP_FILE, f"{REMINDERS_BACKUP_FILE}.backup_{backup_timestamp}")
+        
+        # Réinitialiser les bases
+        leads_db = {}
+        reminders_db = {}
+        
+        imported_leads = 0
+        imported_reminders = 0
+        
+        # Importer les leads
+        if "leads" in backup_data:
+            for lead_id, lead_dict in backup_data["leads"].items():
+                lead = Lead(
+                    id=lead_dict.get('id'),
+                    company=Company(**lead_dict['company']),
+                    contact=Contact(**lead_dict['contact']),
+                    vehicles=[Vehicle(**v) for v in lead_dict.get('vehicles', [])],
+                    status=lead_dict.get('status', 'premier_contact'),
+                    note=lead_dict.get('note'),
+                    delivery_date=lead_dict.get('delivery_date'),
+                    assigned_to_commercial=lead_dict.get('assigned_to_commercial'),
+                    assigned_to_prestataire=lead_dict.get('assigned_to_prestataire'),
+                    reminders=[Reminder(**r) for r in lead_dict.get('reminders', [])],
+                    created_at=lead_dict.get('created_at')
+                )
+                leads_db[lead_id] = lead
+                imported_leads += 1
+        
+        # Importer les rappels
+        if "reminders" in backup_data:
+            for reminder_id, reminder_dict in backup_data["reminders"].items():
+                reminder = Reminder(**reminder_dict)
+                reminders_db[reminder_id] = reminder
+                imported_reminders += 1
+        
+        # Sauvegarder les nouvelles données
+        save_leads_to_file()
+        save_reminders_to_file()
+        
+        return {
+            "message": f"Import réussi - {imported_leads} leads, {imported_reminders} rappels importés",
+            "imported_leads": imported_leads,
+            "imported_reminders": imported_reminders
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur import: {str(e)}")
+
+@app.get("/api/backup/status")
+async def backup_status():
+    """Statut des sauvegardes"""
+    try:
+        status = {
+            "backup_directory": BACKUP_DIR,
+            "leads_backup_exists": os.path.exists(LEADS_BACKUP_FILE),
+            "reminders_backup_exists": os.path.exists(REMINDERS_BACKUP_FILE),
+            "leads_count": len(leads_db),
+            "reminders_count": len(reminders_db)
+        }
+        
+        if status["leads_backup_exists"]:
+            stat = os.stat(LEADS_BACKUP_FILE)
+            status["leads_backup_size"] = stat.st_size
+            status["leads_backup_modified"] = datetime.fromtimestamp(stat.st_mtime).isoformat()
+        
+        if status["reminders_backup_exists"]:
+            stat = os.stat(REMINDERS_BACKUP_FILE)
+            status["reminders_backup_size"] = stat.st_size
+            status["reminders_backup_modified"] = datetime.fromtimestamp(stat.st_mtime).isoformat()
+        
+        return status
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur status: {str(e)}")
+
 if __name__ == "__main__":
     print("🚀 Démarrage CRM LEASINPROFESSIONNEL.FR...")
     port = int(os.environ.get("PORT", 8001))
