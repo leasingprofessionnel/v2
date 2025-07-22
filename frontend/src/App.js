@@ -183,12 +183,14 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
     contact: { first_name: '', last_name: '', email: '', phone: '', position: '' },
     vehicles: [{ 
       brand: '', model: '', carburant: 'diesel', contract_duration: 36, annual_mileage: 15000,
-      tarif_mensuel: '', commission_agence: ''
+      tarif_mensuel: '', commission_agence: '', payment_status: 'en_attente'
     }],
     note: '',
     status: 'premier_contact', // Nouveau champ pour modifier le statut
     assigned_to_prestataire: '',
     assigned_to_commercial: '',
+    delivery_date: '', // Date de livraison
+    contract_end_date: '', // Date de fin de contrat (calculée)
     ...lead
   });
 
