@@ -38,7 +38,9 @@ class CRMAPITester:
     def test_api_root(self):
         """Test API root endpoint"""
         try:
-            response = requests.get(f"{self.base_url}/", headers=self.headers, timeout=10)
+            # The root endpoint is at the base URL without /api prefix
+            root_url = self.base_url.replace('/api', '')
+            response = requests.get(f"{root_url}/", headers=self.headers, timeout=10)
             success = response.status_code == 200
             data = response.json() if success else {}
             details = f"Status: {response.status_code}, Message: {data.get('message', 'N/A')}"
