@@ -1,0 +1,36 @@
+{
+  "eb5a8764": {
+    "id": "eb5a8764",
+    "company": {
+      "name": "AutoPlus SARL",
+      "siret": "12345678901234",
+      "email": "contact@autoplus.fr",
+      "phone": "0123456789"
+    },
+    "contact": {
+      "first_name": "Marie",
+      "last_name": "Dubois",
+      "email": "marie.dubois@autoplus.fr",
+      "phone": "0987654321"
+    },
+    "vehicles": [
+      {
+        "brand": "BMW",
+        "model": "Série 3",
+        "carburant": "diesel",
+        "contract_duration": 36,
+        "annual_mileage": 15000,
+        "tarif_mensuel": "450€",
+        "commission_agence": "800€",
+        "payment_status": "en_attente"
+      }
+    ],
+    "status": "premier_contact",
+    "note": "Client intéressé par véhicule premium",
+    "delivery_date": null,
+    "assigned_to_commercial": "Matthews",
+    "assigned_to_prestataire": "Ayvens",
+    "reminders": [],
+    "created_at": "2025-07-22T12:34:29.479421"
+  }
+}
