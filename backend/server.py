@@ -695,10 +695,41 @@ async def get_dashboard_stats():
     # Recent activities
     recent_activities = await db.activities.find().sort("created_at", -1).limit(5).to_list(5)
     
+    # Commission statistics for current year
+    current_year = datetime.utcnow().year
+    year_start = datetime(current_year, 1, 1)
+    year_end = datetime(current_year + 1, 1, 1)
+    
+    # Get all leads with vehicles created this year
+    leads_this_year = await db.leads.find({
+        "created_at": {"$gte": year_start, "$lt": year_end}
+    }).to_list(None)
+    
+    total_commissions_paid = 0.0
+    total_commissions_pending = 0.0
+    
+    for lead in leads_this_year:
+        vehicles = lead.get("vehicles", [])
+        for vehicle in vehicles:
+            commission_str = vehicle.get("commission_agence", "")
+            commission_amount = extract_commission_amount(commission_str)
+            
+            payment_status = vehicle.get("payment_status", "en_attente")
+            if payment_status == "paye":
+                total_commissions_paid += commission_amount
+            else:
+                total_commissions_pending += commission_amount
+    
     return {
         "total_leads": total_leads,
         "status_stats": status_stats,
-        "recent_activities": [Activity(**activity) for activity in recent_activities]
+        "recent_activities": [Activity(**activity) for activity in recent_activities],
+        "commissions_stats": {
+            "year": current_year,
+            "total_paid": round(total_commissions_paid, 2),
+            "total_pending": round(total_commissions_pending, 2),
+            "total_expected": round(total_commissions_paid + total_commissions_pending, 2)
+        }
     }
 
 # Include the router in the main app
