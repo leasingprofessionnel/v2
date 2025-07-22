@@ -672,32 +672,65 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
             </div>
           </div>
 
-          {/* Dates importantes Section - Affichée seulement si statut "accord" ou dates déjà définies */}
-          {(formData.status === 'accord' || formData.delivery_date || formData.contract_end_date) && (
+          {/* Dates importantes Section - Affichée pour accord ou livree */}
+          {(formData.status === 'accord' || formData.status === 'livree' || formData.delivery_date || formData.contract_end_date) && (
             <div className="bg-amber-50 p-4 rounded-lg">
-              <h4 className="text-lg font-semibold mb-3 text-amber-900">📅 Dates importantes</h4>
+              <h4 className="text-lg font-semibold mb-3 text-amber-900">
+                📅 Dates importantes
+                {formData.status === 'livree' && <span className="ml-2 text-green-700">(Véhicule livré)</span>}
+              </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Date de livraison {formData.status === 'accord' && '*'}
+                    📅 Date de livraison {(formData.status === 'accord' || formData.status === 'livree') && '*'}
                   </label>
                   <input
                     type="date"
                     value={formData.delivery_date || ''}
-                    onChange={(e) => setFormData({ ...formData, delivery_date: e.target.value })}
+                    onChange={(e) => {
+                      const newFormData = { ...formData, delivery_date: e.target.value };
+                      
+                      // Calcul automatique de la date de fin de contrat
+                      if (e.target.value && formData.vehicles.length > 0 && formData.vehicles[0].contract_duration) {
+                        const deliveryDate = new Date(e.target.value);
+                        const contractDuration = parseInt(formData.vehicles[0].contract_duration);
+                        const contractEndDate = new Date(deliveryDate);
+                        contractEndDate.setMonth(contractEndDate.getMonth() + contractDuration);
+                        newFormData.contract_end_date = contractEndDate.toISOString().split('T')[0];
+                      }
+                      
+                      setFormData(newFormData);
+                    }}
                     className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                     disabled={formData.status !== 'accord' && formData.status !== 'livree'}
+                    required={formData.status === 'livree'}
                   />
+                  {formData.status === 'livree' && !formData.delivery_date && (
+                    <p className="text-sm text-red-600 mt-1">Date de livraison requise pour statut "Livré"</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Date de fin de contrat (calculée automatiquement)
+                    📅 Date de fin de contrat 
+                    {formData.vehicles[0]?.contract_duration && (
+                      <span className="text-sm text-gray-500">
+                        (+ {formData.vehicles[0].contract_duration} mois)
+                      </span>
+                    )}
                   </label>
                   <input
                     type="date"
                     value={formData.contract_end_date || ''}
-                    className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                    className="w-full p-3 border border-gray-300 rounded-md bg-gray-100 text-gray-600"
                     disabled
+                    placeholder="Calculé automatiquement"
+                  />
+                  {formData.contract_end_date && (
+                    <p className="text-sm text-green-600 mt-1">
+                      ✅ Contrat se termine le {new Date(formData.contract_end_date).toLocaleDateString('fr-FR')}
+                    </p>
+                  )}
+                </div>
                   />
                 </div>
               </div>
