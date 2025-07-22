@@ -149,6 +149,7 @@ class VehicleCreate(BaseModel):
     annual_mileage: int
     tarif_mensuel: Optional[str] = None
     commission_agence: Optional[str] = None
+    payment_status: PaymentStatus = PaymentStatus.EN_ATTENTE
 
 class ReminderCreate(BaseModel):
     lead_id: str
