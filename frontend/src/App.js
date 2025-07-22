@@ -1054,8 +1054,182 @@ const Calendar = ({ leads }) => {
   );
 };
 
-// Main App Component
-function App() {
+const Backup = () => {
+  const [backupStatus, setBackupStatus] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const fetchBackupStatus = async () => {
+    try {
+      const response = await axios.get(`${API}/backup/status`);
+      setBackupStatus(response.data);
+    } catch (error) {
+      console.error('Error fetching backup status:', error);
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      setLoading(true);
+      setMessage('');
+      const response = await axios.get(`${API}/backup/export`);
+      
+      // Télécharger le fichier JSON
+      const dataStr = JSON.stringify(response.data.data, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      const now = new Date();
+      const timestamp = now.toISOString().slice(0, 19).replace(/:/g, '-');
+      link.download = `CRM_BACKUP_${timestamp}.json`;
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      setMessage(`✅ ${response.data.message}`);
+      fetchBackupStatus();
+    } catch (error) {
+      setMessage(`❌ Erreur export: ${error.response?.data?.detail || error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImport = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      setLoading(true);
+      setMessage('');
+      
+      const text = await file.text();
+      const backupData = JSON.parse(text);
+      
+      if (window.confirm('⚠️ ATTENTION: Cette opération va remplacer TOUTES vos données actuelles. Êtes-vous sûr ?')) {
+        const response = await axios.post(`${API}/backup/import`, backupData);
+        setMessage(`✅ ${response.data.message}`);
+        fetchBackupStatus();
+        
+        // Recharger la page pour afficher les nouvelles données
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
+    } catch (error) {
+      setMessage(`❌ Erreur import: ${error.response?.data?.detail || error.message}`);
+    } finally {
+      setLoading(false);
+      event.target.value = ''; // Reset file input
+    }
+  };
+
+  useEffect(() => {
+    fetchBackupStatus();
+  }, []);
+
+  return (
+    <div className="p-6">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">💾 Gestion des Sauvegardes</h2>
+        <p className="text-gray-600">Sauvegardez et restaurez vos données CRM</p>
+      </div>
+
+      {message && (
+        <div className={`mb-6 p-4 rounded-lg ${message.includes('✅') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+          {message}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Statut des sauvegardes */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-xl font-semibold mb-4 text-gray-900">📊 Statut des Sauvegardes</h3>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+              <span className="font-medium">Leads en mémoire:</span>
+              <span className="text-blue-600 font-bold">{backupStatus.leads_count || 0}</span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+              <span className="font-medium">Rappels en mémoire:</span>
+              <span className="text-green-600 font-bold">{backupStatus.reminders_count || 0}</span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+              <span className="font-medium">Sauvegarde leads:</span>
+              <span className={backupStatus.leads_backup_exists ? 'text-green-600' : 'text-red-600'}>
+                {backupStatus.leads_backup_exists ? '✅ Existe' : '❌ Absent'}
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+              <span className="font-medium">Sauvegarde rappels:</span>
+              <span className={backupStatus.reminders_backup_exists ? 'text-green-600' : 'text-red-600'}>
+                {backupStatus.reminders_backup_exists ? '✅ Existe' : '❌ Absent'}
+              </span>
+            </div>
+            {backupStatus.leads_backup_modified && (
+              <div className="p-3 bg-gray-50 rounded-lg text-sm">
+                <span className="font-medium">Dernière sauvegarde:</span><br/>
+                {new Date(backupStatus.leads_backup_modified).toLocaleString('fr-FR')}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Actions de sauvegarde */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-xl font-semibold mb-4 text-gray-900">⚡ Actions</h3>
+          <div className="space-y-4">
+            <button
+              onClick={handleExport}
+              disabled={loading}
+              className="w-full bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors font-medium disabled:opacity-50"
+            >
+              {loading ? '⏳ Export en cours...' : '📥 Exporter toutes les données'}
+            </button>
+            
+            <div className="relative">
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImport}
+                disabled={loading}
+                className="hidden"
+                id="import-file"
+              />
+              <label
+                htmlFor="import-file"
+                className={`w-full bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors font-medium cursor-pointer block text-center ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                {loading ? '⏳ Import en cours...' : '📤 Importer des données'}
+              </label>
+            </div>
+
+            <button
+              onClick={fetchBackupStatus}
+              className="w-full bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700 transition-colors font-medium"
+            >
+              🔄 Actualiser le statut
+            </button>
+          </div>
+
+          <div className="mt-6 p-4 bg-amber-50 rounded-lg">
+            <h4 className="font-medium text-amber-800 mb-2">💡 Information:</h4>
+            <ul className="text-sm text-amber-700 space-y-1">
+              <li>• Sauvegarde automatique à chaque modification</li>
+              <li>• Restauration automatique au démarrage</li>
+              <li>• Export: fichier JSON téléchargeable</li>
+              <li>• Import: remplace toutes les données</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
   const [activeTab, setActiveTab] = useState('dashboard');
   const [leads, setLeads] = useState([]);
   const [stats, setStats] = useState({});
