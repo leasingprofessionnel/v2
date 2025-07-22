@@ -906,13 +906,13 @@ const LeadsView = ({ leads, config, onRefresh }) => {
         </button>
       </div>
 
-      <div className="flex space-x-4 mb-6">
+      <div className="flex flex-wrap gap-4 mb-6">
         <input
           type="text"
           placeholder="Rechercher..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+          className="flex-1 min-w-64 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
         />
         <select
           value={statusFilter}
@@ -929,6 +929,22 @@ const LeadsView = ({ leads, config, onRefresh }) => {
           <option value="accord">Accord</option>
           <option value="livree">Livrée</option>
           <option value="perdu">Perdu</option>
+        </select>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-blue-50 to-blue-100"
+        >
+          <option value="">📊 Trier par...</option>
+          <option value="company_name">🏢 Nom de société (A-Z)</option>
+          <option value="contact_name">👤 Contact (A-Z)</option>
+          <option value="status">📋 Statut (A-Z)</option>
+          <option value="commercial">👥 Commercial (A-Z)</option>
+          <option value="prestataire">🤝 Prestataire (A-Z)</option>
+          <option value="vehicle_brand">🚗 Marque véhicule (A-Z)</option>
+          <option value="created_at">📅 Date (Plus récent)</option>
+          <option value="created_at_asc">📅 Date (Plus ancien)</option>
+          <option value="commission_total">💰 Commission (Plus élevée)</option>
         </select>
       </div>
 
