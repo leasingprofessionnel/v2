@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """
 Backend API Test Suite for CRM LLD Automobile
-Tests all API endpoints using the public URL from frontend/.env
+Tests all the new features mentioned in the review request:
+1. New commercials (Matthews, Sauveur, Autre)
+2. Extended car brands database (56 brands)
+3. Note field support
+4. Multi-vehicle support
+5. All CRUD operations and filtering
 """
 
 import requests
@@ -17,7 +22,7 @@ class CRMAPITester:
         self.headers = {'Content-Type': 'application/json'}
         self.tests_run = 0
         self.tests_passed = 0
-        self.created_lead_id = None
+        self.created_lead_ids = []
 
     def log_test(self, name: str, success: bool, details: str = ""):
         """Log test results"""
