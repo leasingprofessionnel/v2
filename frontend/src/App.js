@@ -240,13 +240,22 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
             {lead ? 'Modifier le lead' : 'Nouveau lead'}
           </h3>
           {lead && (
-            <button
-              type="button"
-              onClick={() => setShowReminderForm(true)}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-            >
-              📅 Ajouter un rappel
-            </button>
+            <div className="flex space-x-3">
+              <button
+                type="button"
+                onClick={() => handleDownloadPDF()}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
+              >
+                📄 Télécharger PDF
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowReminderForm(true)}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+              >
+                📅 Ajouter un rappel
+              </button>
+            </div>
           )}
         </div>
         
