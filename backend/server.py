@@ -269,6 +269,25 @@ CAR_BRANDS = {
 CONTRACT_DURATIONS = [24, 25, 27, 30, 35, 36, 37, 48, 60]
 ANNUAL_MILEAGES = list(range(10000, 65000, 5000))
 
+# Utility functions
+def calculate_contract_end_date(delivery_date: date, contract_duration_months: int) -> date:
+    """Calculate contract end date based on delivery date and duration in months"""
+    return delivery_date + relativedelta(months=contract_duration_months)
+
+def extract_commission_amount(commission_str: str) -> float:
+    """Extract numeric amount from commission string (e.g., '120€' -> 120.0)"""
+    if not commission_str:
+        return 0.0
+    # Remove common currency symbols and extra characters
+    import re
+    numbers = re.findall(r'[\d,]+\.?\d*', commission_str.replace(',', ''))
+    if numbers:
+        try:
+            return float(numbers[0])
+        except ValueError:
+            return 0.0
+    return 0.0
+
 # PDF Generation Function
 def generate_lead_pdf(lead: Lead) -> str:
     """Generate a PDF for a lead and return the file path"""
