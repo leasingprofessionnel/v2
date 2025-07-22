@@ -197,11 +197,28 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
   const [vehicleCount, setVehicleCount] = useState(1);
   const [showReminderForm, setShowReminderForm] = useState(false);
 
+  // Auto-calculate contract end date when delivery date or contract duration changes
   useEffect(() => {
-    if (lead && lead.vehicles) {
-      setVehicleCount(lead.vehicles.length);
+    if (formData.delivery_date && formData.vehicles.length > 0 && formData.vehicles[0].contract_duration) {
+      const deliveryDate = new Date(formData.delivery_date);
+      const contractMonths = formData.vehicles[0].contract_duration;
+      const endDate = new Date(deliveryDate);
+      endDate.setMonth(endDate.getMonth() + contractMonths);
+      
+      setFormData(prev => ({
+        ...prev,
+        contract_end_date: endDate.toISOString().split('T')[0]
+      }));
     }
-  }, [lead]);
+  }, [formData.delivery_date, formData.vehicles]);
+
+  // Auto-set delivery date when status changes to "accord"
+  useEffect(() => {
+    if (formData.status === 'accord' && !formData.delivery_date) {
+      const today = new Date().toISOString().split('T')[0];
+      setFormData(prev => ({ ...prev, delivery_date: today }));
+    }
+  }, [formData.status]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
