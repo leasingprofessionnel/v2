@@ -1042,8 +1042,10 @@ const LeadsView = ({ leads, config, onRefresh }) => {
                   sortBy === 'commercial' ? 'commercial' :
                   sortBy === 'prestataire' ? 'prestataire' :
                   sortBy === 'vehicle_brand' ? 'marque véhicule' :
-                  sortBy === 'created_at' ? 'date (récent)' :
-                  sortBy === 'created_at_asc' ? 'date (ancien)' :
+                  sortBy === 'lead_creation_date' ? 'date création (récent)' :
+                  sortBy === 'lead_creation_date_asc' ? 'date création (ancien)' :
+                  sortBy === 'created_at' ? 'date système (récent)' :
+                  sortBy === 'created_at_asc' ? 'date système (ancien)' :
                   sortBy === 'commission_total' ? 'commission' : sortBy
                 }
               </span>
