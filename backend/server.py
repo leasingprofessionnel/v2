@@ -625,10 +625,6 @@ async def import_backup(backup_data: dict):
                 reminders_db[reminder_id] = reminder
                 imported_reminders += 1
         
-        # Sauvegarder les nouvelles données
-        save_leads_to_file()
-        save_reminders_to_file()
-        
         return {
             "message": f"Import réussi - {imported_leads} leads, {imported_reminders} rappels importés",
             "imported_leads": imported_leads,
