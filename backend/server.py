@@ -249,12 +249,13 @@ async def get_config():
 async def create_lead(lead_data: LeadCreate):
     company = Company(**lead_data.company.dict())
     contact = Contact(**lead_data.contact.dict())
-    vehicle = Vehicle(**lead_data.vehicle.dict())
+    vehicles = [Vehicle(**vehicle.dict()) for vehicle in lead_data.vehicles]
     
     lead = Lead(
         company=company,
         contact=contact,
-        vehicle=vehicle,
+        vehicles=vehicles,
+        note=lead_data.note,
         assigned_to_prestataire=lead_data.assigned_to_prestataire,
         assigned_to_commercial=lead_data.assigned_to_commercial
     )
