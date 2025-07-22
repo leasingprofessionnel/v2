@@ -463,6 +463,7 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
               onChange={(e) => handleVehicleCountChange(parseInt(e.target.value))}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
             >
+              <option value={0}>0 véhicule (à définir plus tard)</option>
               {Array.from({length: 20}, (_, i) => i + 1).map(num => (
                 <option key={num} value={num}>{num} véhicule{num > 1 ? 's' : ''}</option>
               ))}
