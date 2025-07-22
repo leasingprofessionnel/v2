@@ -176,6 +176,10 @@ CAR_BRANDS = {
 COMMERCIAUX = ["Matthews", "Sauveur", "Autre"]
 PRESTATAIRES = ["Localease", "Leasefactory", "Ayvens", "ALD Automotive", "Arval", "Alphabet", "Leaseplan", "BNP Paribas Leasing", "Crédit Agricole Leasing", "Société Générale Equipment Finance", "Autre"]
 
+# Configuration des durées de contrat et kilométrages
+CONTRACT_DURATIONS = [12, 24, 36, 48, 60]
+ANNUAL_MILEAGES = [10000, 15000, 20000, 25000, 30000, 35000, 40000, 50000]
+
 # Génération PDF
 def generate_lead_pdf(lead: Lead) -> str:
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
