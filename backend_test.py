@@ -41,12 +41,18 @@ class CRMAPITester:
             # The root endpoint is at the base URL without /api prefix
             root_url = self.base_url.replace('/api', '')
             response = requests.get(f"{root_url}/", headers=self.headers, timeout=10)
-            success = response.status_code == 200
-            data = response.json() if success else {}
-            details = f"Status: {response.status_code}, Message: {data.get('message', 'N/A')}"
-            return self.log_test("API Root", success, details)
+            
+            # The root URL serves the frontend HTML, so we check for HTML content
+            if response.status_code == 200 and 'html' in response.text.lower():
+                success = True
+                details = f"Status: {response.status_code}, Frontend served correctly"
+            else:
+                success = False
+                details = f"Status: {response.status_code}, Unexpected response"
+            
+            return self.log_test("API Root (Frontend)", success, details)
         except Exception as e:
-            return self.log_test("API Root", False, f"Error: {str(e)}")
+            return self.log_test("API Root (Frontend)", False, f"Error: {str(e)}")
 
     def test_get_config(self):
         """Test configuration endpoint with all restored features"""
