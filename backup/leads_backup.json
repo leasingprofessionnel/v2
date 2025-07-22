@@ -911,5 +911,77 @@
     "assigned_to_prestataire": null,
     "reminders": [],
     "created_at": "2025-07-22T15:31:24.049996"
+  },
+  "becf7d89": {
+    "id": "becf7d89",
+    "company": {
+      "name": "Lead Date Défaut",
+      "siret": null,
+      "email": "defaut@test.fr",
+      "phone": null
+    },
+    "contact": {
+      "first_name": "Test",
+      "last_name": "Defaut",
+      "email": "defaut@test.fr",
+      "phone": null
+    },
+    "vehicles": [
+      {
+        "brand": "Renault",
+        "model": "Clio",
+        "carburant": "essence",
+        "contract_duration": 36,
+        "annual_mileage": 15000,
+        "tarif_mensuel": null,
+        "commission_agence": null,
+        "payment_status": "en_attente"
+      }
+    ],
+    "status": "a_contacter",
+    "note": "Lead avec date par défaut",
+    "lead_creation_date": "2025-07-22",
+    "delivery_date": null,
+    "contract_end_date": null,
+    "assigned_to_commercial": null,
+    "assigned_to_prestataire": null,
+    "reminders": [],
+    "created_at": "2025-07-22T15:31:33.444605"
+  },
+  "79c79298": {
+    "id": "79c79298",
+    "company": {
+      "name": "Lead Date Future",
+      "siret": null,
+      "email": "future@test.fr",
+      "phone": null
+    },
+    "contact": {
+      "first_name": "Test",
+      "last_name": "Future",
+      "email": "future@test.fr",
+      "phone": null
+    },
+    "vehicles": [
+      {
+        "brand": "Tesla",
+        "model": "Model 3",
+        "carburant": "electrique",
+        "contract_duration": 36,
+        "annual_mileage": 15000,
+        "tarif_mensuel": null,
+        "commission_agence": null,
+        "payment_status": "en_attente"
+      }
+    ],
+    "status": "a_contacter",
+    "note": "Lead planifié pour le futur",
+    "lead_creation_date": "2025-08-15",
+    "delivery_date": null,
+    "contract_end_date": null,
+    "assigned_to_commercial": null,
+    "assigned_to_prestataire": null,
+    "reminders": [],
+    "created_at": "2025-07-22T15:31:33.477144"
   }
 }
