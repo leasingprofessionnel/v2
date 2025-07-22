@@ -84,6 +84,7 @@ class Lead(BaseModel):
     status: str = "a_contacter"  # Nouveau statut par défaut
     note: Optional[str] = None
     delivery_date: Optional[str] = None
+    contract_end_date: Optional[str] = None
     assigned_to_commercial: Optional[str] = None
     assigned_to_prestataire: Optional[str] = None
     reminders: List[Reminder] = []
