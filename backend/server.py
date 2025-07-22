@@ -329,7 +329,7 @@ def generate_lead_pdf(lead: Lead) -> str:
     )
     
     # Title
-    story.append(Paragraph("🚗 CRM LLD Automobile - Fiche Lead", title_style))
+    story.append(Paragraph("CRM LEASINPROFESSIONNEL.FR - Fiche Lead", title_style))
     story.append(Spacer(1, 20))
     
     # Lead Info Header
