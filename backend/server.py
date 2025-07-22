@@ -182,9 +182,13 @@ ANNUAL_MILEAGES = [10000, 15000, 20000, 25000, 30000, 35000, 40000, 50000]
 
 # Génération PDF
 def generate_lead_pdf(lead: Lead) -> str:
-    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
-    temp_path = temp_file.name
-    temp_file.close()
+    import tempfile
+    import os
+    
+    # Créer un nom de fichier temporaire avec extension .pdf garantie
+    temp_dir = tempfile.gettempdir()
+    filename = f"lead_{lead.id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    temp_path = os.path.join(temp_dir, filename)
     
     doc = SimpleDocTemplate(temp_path, pagesize=A4)
     story = []
