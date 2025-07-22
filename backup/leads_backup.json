@@ -108,7 +108,17 @@
     "delivery_date": null,
     "assigned_to_commercial": "Matthews",
     "assigned_to_prestataire": "Tesla",
-    "reminders": [],
+    "reminders": [
+      {
+        "id": "3db8628f",
+        "lead_id": "81028e6f",
+        "title": "Test suppression UI",
+        "description": "Ce rappel sera supprimé via l'interface utilisateur",
+        "reminder_date": "2025-07-23T15:30:00",
+        "completed": false,
+        "created_at": "2025-07-22T12:50:32.179925"
+      }
+    ],
     "created_at": "2025-07-22T12:40:07.007033"
   }
 }
