@@ -18,7 +18,7 @@ const Navbar = ({ activeTab, setActiveTab }) => (
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              {['dashboard', 'leads', 'calendar'].map((tab) => (
+              {['dashboard', 'leads', 'calendar', 'backup'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -31,6 +31,7 @@ const Navbar = ({ activeTab, setActiveTab }) => (
                   {tab === 'dashboard' && '📊 Dashboard'}
                   {tab === 'leads' && '👥 Leads'}
                   {tab === 'calendar' && '📅 Calendrier'}
+                  {tab === 'backup' && '💾 Sauvegardes'}
                 </button>
               ))}
             </div>
