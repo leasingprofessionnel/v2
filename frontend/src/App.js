@@ -91,18 +91,92 @@ const Dashboard = ({ stats, statusColors }) => (
   </div>
 );
 
+const ReminderForm = ({ leadId, onSave, onCancel }) => {
+  const [reminderData, setReminderData] = useState({
+    title: '',
+    description: '',
+    reminder_date: new Date().toISOString().slice(0, 16) // Default to now
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave({
+      ...reminderData,
+      lead_id: leadId,
+      reminder_date: new Date(reminderData.reminder_date).toISOString()
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+        <h3 className="text-lg font-bold mb-4">📅 Ajouter un rappel</h3>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Titre du rappel *"
+            value={reminderData.title}
+            onChange={(e) => setReminderData({ ...reminderData, title: e.target.value })}
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          <textarea
+            placeholder="Description (optionnel)"
+            value={reminderData.description}
+            onChange={(e) => setReminderData({ ...reminderData, description: e.target.value })}
+            rows="3"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Date et heure du rappel *
+            </label>
+            <input
+              type="datetime-local"
+              value={reminderData.reminder_date}
+              onChange={(e) => setReminderData({ ...reminderData, reminder_date: e.target.value })}
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Ajouter
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const LeadForm = ({ lead, onSave, onCancel, config }) => {
   const [formData, setFormData] = useState({
     company: { name: '', siret: '', address: '', phone: '', email: '' },
     contact: { first_name: '', last_name: '', email: '', phone: '', position: '' },
-    vehicles: [{ brand: '', model: '', carburant: 'diesel', contract_duration: 36, annual_mileage: 15000 }],
+    vehicles: [{ 
+      brand: '', model: '', carburant: 'diesel', contract_duration: 36, annual_mileage: 15000,
+      tarif_mensuel: '', commission_agence: ''
+    }],
     note: '',
+    status: 'premier_contact', // Nouveau champ pour modifier le statut
     assigned_to_prestataire: '',
     assigned_to_commercial: '',
     ...lead
   });
 
   const [vehicleCount, setVehicleCount] = useState(1);
+  const [showReminderForm, setShowReminderForm] = useState(false);
 
   useEffect(() => {
     if (lead && lead.vehicles) {
@@ -122,7 +196,10 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
     if (newCount > vehicles.length) {
       // Add new vehicles
       for (let i = vehicles.length; i < newCount; i++) {
-        vehicles.push({ brand: '', model: '', carburant: 'diesel', contract_duration: 36, annual_mileage: 15000 });
+        vehicles.push({ 
+          brand: '', model: '', carburant: 'diesel', contract_duration: 36, annual_mileage: 15000,
+          tarif_mensuel: '', commission_agence: ''
+        });
       }
     } else {
       // Remove excess vehicles
@@ -144,12 +221,34 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
     setFormData({ ...formData, vehicles });
   };
 
+  const handleAddReminder = async (reminderData) => {
+    try {
+      await axios.post(`${API}/reminders`, reminderData);
+      setShowReminderForm(false);
+      alert('Rappel ajouté avec succès !');
+    } catch (error) {
+      console.error('Error creating reminder:', error);
+      alert('Erreur lors de l\'ajout du rappel');
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
       <div className="relative top-8 mx-auto p-8 border w-11/12 max-w-6xl shadow-lg rounded-md bg-white max-h-screen overflow-y-auto">
-        <h3 className="text-2xl font-bold mb-6 text-gray-900">
-          {lead ? 'Modifier le lead' : 'Nouveau lead'}
-        </h3>
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-2xl font-bold text-gray-900">
+            {lead ? 'Modifier le lead' : 'Nouveau lead'}
+          </h3>
+          {lead && (
+            <button
+              type="button"
+              onClick={() => setShowReminderForm(true)}
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            >
+              📅 Ajouter un rappel
+            </button>
+          )}
+        </div>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Company Section */}
@@ -250,6 +349,26 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
             </div>
           </div>
 
+          {/* Status Section - Nouveau */}
+          <div className="bg-indigo-50 p-4 rounded-lg">
+            <h4 className="text-lg font-semibold mb-3 text-indigo-900">📊 Statut du Lead</h4>
+            <select
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="premier_contact">Premier contact</option>
+              <option value="relance">Relance</option>
+              <option value="attribue">Attribué</option>
+              <option value="offre">Offre</option>
+              <option value="attente_document">Attente document</option>
+              <option value="etude_en_cours">Étude en cours</option>
+              <option value="accord">Accord</option>
+              <option value="livree">Livrée</option>
+              <option value="perdu">Perdu</option>
+            </select>
+          </div>
+
           {/* Vehicle Count Selection */}
           <div className="bg-yellow-50 p-4 rounded-lg">
             <h4 className="text-lg font-semibold mb-3 text-yellow-900">🔢 Nombre de véhicules</h4>
@@ -328,6 +447,24 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
                         <option key={mileage} value={mileage}>{mileage.toLocaleString()} km/an</option>
                       ))}
                     </select>
+
+                    {/* Nouveaux champs */}
+                    <input
+                      type="text"
+                      placeholder="Tarif mensuel"
+                      value={vehicle.tarif_mensuel || ''}
+                      onChange={(e) => updateVehicle(index, 'tarif_mensuel', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="mt-3">
+                    <input
+                      type="text"
+                      placeholder="Commission agence"
+                      value={vehicle.commission_agence || ''}
+                      onChange={(e) => updateVehicle(index, 'commission_agence', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    />
                   </div>
                 </div>
               );
@@ -396,6 +533,14 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
             </button>
           </div>
         </form>
+
+        {showReminderForm && (
+          <ReminderForm
+            leadId={lead?.id}
+            onSave={handleAddReminder}
+            onCancel={() => setShowReminderForm(false)}
+          />
+        )}
       </div>
     </div>
   );
@@ -439,6 +584,9 @@ const LeadsTable = ({ leads, onEdit, onDelete, onStatusChange, statusColors, con
                       <div>{lead.vehicles[0].brand} {lead.vehicles[0].model}</div>
                       <div className="text-sm text-gray-500">
                         {lead.vehicles[0].carburant} - {lead.vehicles[0].contract_duration}mois
+                        {lead.vehicles[0].tarif_mensuel && (
+                          <span className="ml-2 text-green-600">{lead.vehicles[0].tarif_mensuel}</span>
+                        )}
                       </div>
                       {lead.vehicles.length > 1 && (
                         <div className="text-xs text-blue-600">
@@ -613,27 +761,69 @@ const LeadsView = ({ leads, config, onRefresh }) => {
   );
 };
 
-const Calendar = ({ leads }) => (
-  <div className="p-6">
-    <h2 className="text-3xl font-bold text-gray-900 mb-6">Calendrier & Tâches</h2>
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <p className="text-gray-600 mb-4">Prochaines tâches et rappels :</p>
-      <div className="space-y-4">
-        {leads.slice(0, 5).map((lead) => (
-          <div key={lead.id} className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg">
-            <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-            <div>
-              <p className="font-medium">Relancer {lead.contact.first_name} {lead.contact.last_name}</p>
-              <p className="text-sm text-gray-600">
-                {lead.company.name} - {lead.vehicles && lead.vehicles[0] ? `${lead.vehicles[0].brand} ${lead.vehicles[0].model}` : 'Véhicule à définir'}
-              </p>
-            </div>
+const Calendar = ({ leads }) => {
+  const [upcomingReminders, setUpcomingReminders] = useState([]);
+
+  const fetchReminders = async () => {
+    try {
+      const response = await axios.get(`${API}/calendar/reminders?days=30`);
+      setUpcomingReminders(response.data);
+    } catch (error) {
+      console.error('Error fetching reminders:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchReminders();
+  }, []);
+
+  return (
+    <div className="p-6">
+      <h2 className="text-3xl font-bold text-gray-900 mb-6">Calendrier & Tâches</h2>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-xl font-semibold mb-4 text-gray-900">📅 Rappels programmés</h3>
+          <div className="space-y-4">
+            {upcomingReminders.length > 0 ? (
+              upcomingReminders.map((reminder) => (
+                <div key={reminder.id} className="flex items-center space-x-4 p-4 bg-orange-50 rounded-lg">
+                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">{reminder.title}</p>
+                    <p className="text-sm text-gray-600">{reminder.description}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(reminder.reminder_date).toLocaleString('fr-FR')}
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">Aucun rappel programmé</p>
+            )}
           </div>
-        ))}
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-xl font-semibold mb-4 text-gray-900">📋 Tâches suggérées</h3>
+          <div className="space-y-4">
+            {leads.slice(0, 5).map((lead) => (
+              <div key={lead.id} className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg">
+                <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                <div>
+                  <p className="font-medium">Relancer {lead.contact.first_name} {lead.contact.last_name}</p>
+                  <p className="text-sm text-gray-600">
+                    {lead.company.name} - {lead.vehicles && lead.vehicles[0] ? `${lead.vehicles[0].brand} ${lead.vehicles[0].model}` : 'Véhicule à définir'}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Main App Component
 function App() {
