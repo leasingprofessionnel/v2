@@ -18,7 +18,7 @@ from typing import Dict, Any
 class CRMAPITester:
     def __init__(self):
         # Use the public URL from frontend/.env
-        self.base_url = "https://9abe3c42-2426-4b4a-a2e0-1b6d026d6b24.preview.emergentagent.com/api"
+        self.base_url = "https://454a73e1-6d5e-4555-953b-8ca2bf3fe85e.preview.emergentagent.com/api"
         self.headers = {'Content-Type': 'application/json'}
         self.tests_run = 0
         self.tests_passed = 0
