@@ -871,131 +871,235 @@ const LeadForm = ({ lead, onSave, onCancel, config }) => {
   );
 };
 
-const LeadsTable = ({ leads, onEdit, onDelete, onStatusChange, statusColors, config }) => (
-  <div className="bg-white rounded-lg shadow-md overflow-hidden">
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Société</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Véhicules</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date création</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attribution</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {leads.map((lead) => (
-            <tr key={lead.id} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div>
-                  <div className="text-sm font-medium text-gray-900">{lead.company.name}</div>
-                  <div className="text-sm text-gray-500">{lead.company.siret}</div>
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div>
-                  <div className="text-sm font-medium text-gray-900">
-                    {lead.contact.first_name} {lead.contact.last_name}
-                  </div>
-                  <div className="text-sm text-gray-500">{lead.contact.email}</div>
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">
-                  {lead.vehicles && lead.vehicles.length > 0 ? (
-                    <>
-                      <div>
-                        {lead.vehicles[0].brand || 'Marque'} {lead.vehicles[0].model || (lead.vehicles[0].brand ? '(modèle à définir)' : 'non définie')}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {lead.vehicles[0].carburant ? `${lead.vehicles[0].carburant}` : 'Carburant à définir'}
-                        {lead.vehicles[0].contract_duration && ` - ${lead.vehicles[0].contract_duration}mois`}
-                        {lead.vehicles[0].tarif_mensuel && (
-                          <span className="ml-2 text-green-600">{lead.vehicles[0].tarif_mensuel}</span>
-                        )}
-                        {lead.vehicles[0].commission_agence && (
-                          <span className={`ml-2 text-xs px-2 py-1 rounded ${
-                            lead.vehicles[0].payment_status === 'paye' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-orange-100 text-orange-800'
-                          }`}>
-                            {lead.vehicles[0].payment_status === 'paye' ? '✓ Payé' : '⏳ Attente'}
-                          </span>
-                        )}
-                      </div>
-                      {lead.vehicles.length > 1 && (
-                        <div className="text-xs text-blue-600">
-                          +{lead.vehicles.length - 1} véhicule{lead.vehicles.length > 2 ? 's' : ''}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="text-sm text-gray-400 italic">
-                      <span className="inline-block w-4 h-4 text-center">🚗</span> À définir plus tard
-                    </div>
-                  )}
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <select
-                  value={lead.status}
-                  onChange={(e) => onStatusChange(lead.id, e.target.value)}
-                  className="text-sm border-none bg-transparent focus:ring-2 focus:ring-blue-500 rounded"
-                >
-                  <option value="a_contacter">🔴 À contacter</option>
-                  <option value="premier_contact">Premier contact</option>
-                  <option value="relance">Relance</option>
-                  <option value="attribue">Attribué</option>
-                  <option value="offre">Offre</option>
-                  <option value="attente_document">Attente document</option>
-                  <option value="etude_en_cours">Étude en cours</option>
-                  <option value="accord">Accord</option>
-                  <option value="livree">🟢 Livrée</option>
-                  <option value="perdu">Perdu</option>
-                </select>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <div className="font-medium">
-                  {lead.lead_creation_date ? 
-                    new Date(lead.lead_creation_date).toLocaleDateString('fr-FR') : 
-                    'Non définie'
-                  }
-                </div>
-                <div className="text-xs text-gray-500">
-                  {lead.created_at ? 
-                    `Système: ${new Date(lead.created_at).toLocaleDateString('fr-FR')}` : 
-                    ''
-                  }
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <div>{lead.assigned_to_commercial}</div>
-                <div className="text-gray-500">{lead.assigned_to_prestataire}</div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <button
-                  onClick={() => onEdit(lead)}
-                  className="text-blue-600 hover:text-blue-900 mr-3"
-                >
-                  Modifier
-                </button>
-                <button
-                  onClick={() => onDelete(lead.id)}
-                  className="text-red-600 hover:text-red-900"
-                >
-                  Supprimer
-                </button>
-              </td>
+const LeadsTable = ({ leads, onEdit, onDelete, onStatusChange, statusColors, config }) => {
+  return (
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {/* Version Desktop - Table */}
+      <div className="hidden lg:block overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Société</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Véhicules</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date création</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attribution</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {leads.map((lead) => (
+              <tr key={lead.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">{lead.company.name}</div>
+                    <div className="text-sm text-gray-500">{lead.company.siret}</div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {lead.contact.first_name} {lead.contact.last_name}
+                    </div>
+                    <div className="text-sm text-gray-500">{lead.contact.email}</div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">
+                    {lead.vehicles && lead.vehicles.length > 0 ? (
+                      <>
+                        <div>
+                          {lead.vehicles[0].brand || 'Marque'} {lead.vehicles[0].model || (lead.vehicles[0].brand ? '(modèle à définir)' : 'non définie')}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {lead.vehicles[0].carburant ? `${lead.vehicles[0].carburant}` : 'Carburant à définir'}
+                          {lead.vehicles[0].contract_duration && ` - ${lead.vehicles[0].contract_duration}mois`}
+                          {lead.vehicles[0].tarif_mensuel && (
+                            <span className="ml-2 text-green-600">{lead.vehicles[0].tarif_mensuel}</span>
+                          )}
+                          {lead.vehicles[0].commission_agence && (
+                            <span className={`ml-2 text-xs px-2 py-1 rounded ${
+                              lead.vehicles[0].payment_status === 'paye' 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-orange-100 text-orange-800'
+                            }`}>
+                              {lead.vehicles[0].payment_status === 'paye' ? '✓ Payé' : '⏳ Attente'}
+                            </span>
+                          )}
+                        </div>
+                        {lead.vehicles.length > 1 && (
+                          <div className="text-xs text-blue-600">
+                            +{lead.vehicles.length - 1} véhicule{lead.vehicles.length > 2 ? 's' : ''}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="text-sm text-gray-400 italic">
+                        <span className="inline-block w-4 h-4 text-center">🚗</span> À définir plus tard
+                      </div>
+                    )}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <select
+                    value={lead.status}
+                    onChange={(e) => onStatusChange(lead.id, e.target.value)}
+                    className="text-sm border-none bg-transparent focus:ring-2 focus:ring-blue-500 rounded"
+                  >
+                    <option value="a_contacter">🔴 À contacter</option>
+                    <option value="premier_contact">Premier contact</option>
+                    <option value="relance">Relance</option>
+                    <option value="attribue">Attribué</option>
+                    <option value="offre">Offre</option>
+                    <option value="attente_document">Attente document</option>
+                    <option value="etude_en_cours">Étude en cours</option>
+                    <option value="accord">Accord</option>
+                    <option value="livree">🟢 Livrée</option>
+                    <option value="perdu">Perdu</option>
+                  </select>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <div className="font-medium">
+                    {lead.lead_creation_date ? 
+                      new Date(lead.lead_creation_date).toLocaleDateString('fr-FR') : 
+                      'Non définie'
+                    }
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {lead.created_at ? 
+                      `Système: ${new Date(lead.created_at).toLocaleDateString('fr-FR')}` : 
+                      ''
+                    }
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <div>{lead.assigned_to_commercial}</div>
+                  <div className="text-gray-500">{lead.assigned_to_prestataire}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <button
+                    onClick={() => onEdit(lead)}
+                    className="text-blue-600 hover:text-blue-900 mr-3"
+                  >
+                    Modifier
+                  </button>
+                  <button
+                    onClick={() => onDelete(lead.id)}
+                    className="text-red-600 hover:text-red-900"
+                  >
+                    Supprimer
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Version Mobile - Cards */}
+      <div className="lg:hidden">
+        <div className="divide-y divide-gray-200">
+          {leads.length > 0 ? (
+            leads.map((lead) => (
+              <div key={lead.id} className="p-4 space-y-3">
+                {/* En-tête de la carte */}
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-medium text-gray-900">{lead.company.name}</h3>
+                    <p className="text-sm text-gray-500">{lead.contact.first_name} {lead.contact.last_name}</p>
+                  </div>
+                  <div className="ml-4 flex space-x-2">
+                    <button
+                      onClick={() => onEdit(lead)}
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={() => onDelete(lead.id)}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+
+                {/* Statut */}
+                <div className="flex items-center space-x-3">
+                  <span className="text-sm font-medium text-gray-700">Statut:</span>
+                  <select
+                    value={lead.status}
+                    onChange={(e) => onStatusChange(lead.id, e.target.value)}
+                    className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="a_contacter">🔴 À contacter</option>
+                    <option value="premier_contact">Premier contact</option>
+                    <option value="relance">Relance</option>
+                    <option value="attribue">Attribué</option>
+                    <option value="offre">Offre</option>
+                    <option value="attente_document">Attente document</option>
+                    <option value="etude_en_cours">Étude en cours</option>
+                    <option value="accord">Accord</option>
+                    <option value="livree">🟢 Livrée</option>
+                    <option value="perdu">Perdu</option>
+                  </select>
+                </div>
+
+                {/* Véhicule */}
+                {lead.vehicles && lead.vehicles.length > 0 && (
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm font-medium text-gray-700 mb-1">🚗 Véhicule:</p>
+                    <p className="text-sm text-gray-900">
+                      {lead.vehicles[0].brand || 'Marque'} {lead.vehicles[0].model || 'Modèle'} 
+                      {lead.vehicles[0].carburant && ` (${lead.vehicles[0].carburant})`}
+                    </p>
+                    {lead.vehicles[0].tarif_mensuel && (
+                      <p className="text-sm text-green-600 mt-1">💰 {lead.vehicles[0].tarif_mensuel}</p>
+                    )}
+                    {lead.vehicles.length > 1 && (
+                      <p className="text-xs text-blue-600 mt-1">+{lead.vehicles.length - 1} autre(s) véhicule(s)</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Informations complémentaires */}
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-gray-500">📅 Création:</p>
+                    <p className="font-medium">
+                      {lead.lead_creation_date ? 
+                        new Date(lead.lead_creation_date).toLocaleDateString('fr-FR') : 
+                        'Non définie'
+                      }
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">👤 Commercial:</p>
+                    <p className="font-medium">{lead.assigned_to_commercial || 'Non assigné'}</p>
+                  </div>
+                </div>
+
+                {/* Contact */}
+                <div className="pt-2 border-t border-gray-100">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500">{lead.contact.email}</span>
+                    <span className="text-gray-500">{lead.contact.phone}</span>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <div className="text-4xl text-gray-300 mb-4">📋</div>
+              <p>Aucun lead trouvé</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const LeadsView = ({ leads, config, onRefresh }) => {
   const [showForm, setShowForm] = useState(false);
